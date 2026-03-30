@@ -74,6 +74,41 @@ use ThemeGrill\WoocommerceCustomizer\Icon;
 				</div>
 				<!-- ./ End Ajax navigation -->
 
+				<?php
+				$eligibility_access = \ThemeGrill\WoocommerceCustomizer\EligibilityAccess::instance();
+				$eligibility_rules  = $eligibility_access->get_rules();
+				$eligibility_saved  = $eligibility_access->get_eligibility_settings();
+				?>
+				<?php if ( ! empty( $eligibility_rules ) ) : ?>
+				<div class="tgwc-settings-developer-section">
+					<div class="tgwc-section-header"><?php esc_html_e( 'Eligibility Access', 'customize-my-account-page-for-woocommerce' ); ?></div>
+					<div class="row tgwc-settings-row" style="margin-bottom: 0;">
+						<div class="col-label tgwc-settings-col-label" style="flex: 0 0 100%; max-width: 100%; margin-bottom: 12px;">
+							<span class="setting-help"><?php esc_html_e( 'Hide menu items from users who don\'t have relevant data. When enabled, the tab is only visible to users who qualify.', 'customize-my-account-page-for-woocommerce' ); ?></span>
+						</div>
+					</div>
+					<?php foreach ( $eligibility_rules as $rule_key => $rule ) : ?>
+					<div class="row tgwc-settings-row">
+						<div class="col-label tgwc-settings-col-label">
+							<p class="setting-label"><?php echo esc_html( $rule['label'] ); ?></p>
+							<span class="setting-help"><?php echo esc_html( $rule['description'] ); ?></span>
+						</div>
+						<div class="col-input">
+							<div class="tgwc-toggle-section">
+								<span class="tgwc-toggle-form">
+									<input type="checkbox"
+										<?php checked( ! empty( $eligibility_saved[ $rule_key ] ) ); ?>
+										name="tgwc_settings[eligibility][<?php echo esc_attr( $rule_key ); ?>]"
+										value="1" />
+									<span class="slider round"></span>
+								</span>
+							</div>
+						</div>
+					</div>
+					<?php endforeach; ?>
+				</div>
+				<?php endif; ?>
+
 				<div class="tgwc-settings-developer-section">
 					<div class="tgwc-section-header">Developer Options</div>
 					<!-- Enable debug -->

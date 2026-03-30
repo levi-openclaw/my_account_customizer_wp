@@ -88,13 +88,6 @@ class EligibilityAccess {
 				'callback'    => array( $this, 'user_has_downloads' ),
 				'plugin'      => null,
 			),
-			'payment-methods' => array(
-				'label'       => __( 'Payment Methods', 'customize-my-account-page-for-woocommerce' ),
-				'description' => __( 'Only show when saved payment methods are available.', 'customize-my-account-page-for-woocommerce' ),
-				'endpoint'    => 'payment-methods',
-				'callback'    => array( $this, 'user_has_payment_methods' ),
-				'plugin'      => null,
-			),
 			'license-keys'  => array(
 				'label'       => __( 'License Keys', 'customize-my-account-page-for-woocommerce' ),
 				'description' => __( 'Only show when the user has license keys. Works with WooCommerce Software Add-on, License Manager, and similar plugins.', 'customize-my-account-page-for-woocommerce' ),
@@ -229,19 +222,6 @@ class EligibilityAccess {
 		}
 		$downloads = wc_get_customer_available_downloads( get_current_user_id() );
 		return ! empty( $downloads );
-	}
-
-	/**
-	 * Check if user has saved payment methods.
-	 *
-	 * @return bool
-	 */
-	public function user_has_payment_methods() {
-		if ( ! function_exists( 'wc_get_customer_saved_methods_list' ) ) {
-			return false;
-		}
-		$methods = wc_get_customer_saved_methods_list( get_current_user_id() );
-		return ! empty( $methods );
 	}
 
 	/**
