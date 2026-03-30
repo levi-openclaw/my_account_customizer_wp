@@ -223,8 +223,6 @@ class EligibilityAccess {
 	/**
 	 * Get the saved custom endpoint rules from settings.
 	 *
-	 * Each rule: { endpoint: string, product_ids: int[], require_active: bool }
-	 *
 	 * @return array
 	 */
 	public function get_custom_endpoint_rules() {
@@ -233,46 +231,55 @@ class EligibilityAccess {
 	}
 
 	/**
-	 * Check if a user has a subscription for a specific product.
+	 * Build a map of the current user's subscription product IDs grouped
+	 * by status. Single query, cached for the request.
 	 *
-	 * @param int  $product_id     The subscription product ID.
-	 * @param bool $require_active If true, only active/pending-cancel counts.
-	 * @return bool
+	 * Returns: { product_id => [ 'active', 'cancelled', ... ] }
+	 *
+	 * @return array
 	 */
-	private function user_has_subscription_for_product( $product_id, $require_active = false ) {
-		if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
-			return false;
+	private function get_user_subscription_product_map() {
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
 		}
 
-		$statuses = $require_active
-			? array( 'active', 'pending-cancel' )
-			: array( 'active', 'on-hold', 'pending', 'pending-cancel', 'cancelled', 'expired' );
+		$cache = array();
+
+		if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
+			return $cache;
+		}
 
 		$subscriptions = wcs_get_subscriptions(
 			array(
 				'customer_id'            => get_current_user_id(),
-				'subscription_status'    => $statuses,
+				'subscription_status'    => 'any',
 				'subscriptions_per_page' => -1,
 			)
 		);
 
 		foreach ( $subscriptions as $subscription ) {
+			$status = $subscription->get_status();
 			foreach ( $subscription->get_items() as $item ) {
-				if ( (int) $item->get_product_id() === (int) $product_id ) {
-					return true;
+				$pid = (int) $item->get_product_id();
+				if ( $pid ) {
+					$cache[ $pid ][] = $status;
 				}
-				// Also check variation parent.
-				if ( method_exists( $item, 'get_variation_id' ) && (int) $item->get_variation_id() === (int) $product_id ) {
-					return true;
+				if ( method_exists( $item, 'get_variation_id' ) ) {
+					$vid = (int) $item->get_variation_id();
+					if ( $vid ) {
+						$cache[ $vid ][] = $status;
+					}
 				}
 			}
 		}
 
-		return false;
+		return $cache;
 	}
 
 	/**
 	 * Get endpoints to hide based on custom subscription rules.
+	 * Uses a single cached query for all rules.
 	 *
 	 * @return array Endpoint slugs to hide.
 	 */
@@ -284,6 +291,9 @@ class EligibilityAccess {
 			return $hide;
 		}
 
+		$product_map   = $this->get_user_subscription_product_map();
+		$active_states = array( 'active', 'pending-cancel' );
+
 		foreach ( $rules as $rule ) {
 			$endpoint       = isset( $rule['endpoint'] ) ? sanitize_text_field( $rule['endpoint'] ) : '';
 			$product_ids    = isset( $rule['product_ids'] ) ? array_map( 'absint', (array) $rule['product_ids'] ) : array();
@@ -293,10 +303,17 @@ class EligibilityAccess {
 				continue;
 			}
 
-			// User must have a subscription for ANY of the listed product IDs.
 			$eligible = false;
 			foreach ( $product_ids as $pid ) {
-				if ( $this->user_has_subscription_for_product( $pid, $require_active ) ) {
+				if ( ! isset( $product_map[ $pid ] ) ) {
+					continue;
+				}
+				if ( ! $require_active ) {
+					$eligible = true;
+					break;
+				}
+				// Check if any subscription status for this product is active.
+				if ( array_intersect( $product_map[ $pid ], $active_states ) ) {
 					$eligible = true;
 					break;
 				}
