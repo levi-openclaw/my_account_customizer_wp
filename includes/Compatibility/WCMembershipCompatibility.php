@@ -403,8 +403,29 @@ class WCMembershipCompatibility {
 			return;
 		}
 
-		// Step 2: Render as horizontal list items with inline styles (theme-proof).
-		echo '<div style="display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:10px !important;">';
+		// Step 2: Render using proven card pattern — scoped styles + clean HTML.
+		?>
+		<style>
+			.tgwc-dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; align-content: start; }
+			.tgwc-dc { display: flex; align-items: center; gap: 14px; padding: 8px 14px 8px 8px; border: 2px solid rgba(23,25,21,0.1); border-radius: 8px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; box-sizing: border-box; transition: border-color .2s, background .2s; }
+			.tgwc-dc:hover { border-color: rgba(162,150,74,0.25); background: rgba(162,150,74,0.08); }
+			.tgwc-dc-thumb { flex: 0 0 80px; width: 80px; height: 58px; border-radius: 5px; overflow: hidden; background: rgba(23,25,21,0.05); }
+			.tgwc-dc-thumb img { width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; margin: 0 !important; padding: 0 !important; max-width: none !important; }
+			.tgwc-dc-body { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+			.tgwc-dc-name { font-family: 'DM Sans', -apple-system, sans-serif; font-size: 13px; font-weight: 600; color: #171915; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+			.tgwc-dc-end { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+			.tgwc-dc-badge { display: inline-block; background: #171915; color: #fff; padding: 2px 10px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border-radius: 3px; line-height: 1.6; }
+			.tgwc-dc-badge-free { background: #a2964a; }
+			.tgwc-dc-prices { display: flex; align-items: baseline; gap: 5px; font-family: 'DM Sans', sans-serif; font-size: 13px; }
+			.tgwc-dc-prices del { color: rgba(23,25,21,0.4); font-weight: 400; font-size: 12px; }
+			.tgwc-dc-prices strong { font-weight: 700; color: #171915; }
+			.tgwc-dc-via { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(23,25,21,0.45); }
+			.tgwc-dc-cart { display: inline-block; margin-top: 4px; padding: 4px 14px; border-radius: 4px; background: #a2964a; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.04em; transition: background .15s; }
+			.tgwc-dc-cart:hover { background: #8a7f3e; }
+			@media (max-width: 768px) { .tgwc-dg { grid-template-columns: 1fr; } }
+		</style>
+		<?php
+		echo '<div class="tgwc-dg">';
 
 		foreach ( $product_discounts as $product_id => $disc ) {
 			$product = wc_get_product( $product_id );
@@ -415,59 +436,48 @@ class WCMembershipCompatibility {
 			$name          = $product->get_name();
 			$permalink     = $product->get_permalink();
 			$regular_price = (float) $product->get_regular_price();
+			$thumb_id      = $product->get_image_id();
+			$thumb_url     = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' ) : wc_placeholder_img_src( 'thumbnail' );
+			$add_to_cart   = $product->add_to_cart_url();
 
-			// Get raw image URL to avoid WooCommerce img classes that theme overrides.
-			$thumb_id  = $product->get_image_id();
-			$thumb_url = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' ) : wc_placeholder_img_src( 'thumbnail' );
-
-			// Calculate member price and badge.
 			if ( $disc['is_pct'] ) {
 				if ( $disc['amount'] >= 100 ) {
 					$badge_text   = __( 'FREE', 'customize-my-account-page-for-woocommerce' );
+					$badge_class  = 'tgwc-dc-badge tgwc-dc-badge-free';
 					$member_price = 0;
 				} else {
 					$badge_text   = round( $disc['amount'] ) . '% ' . __( 'off', 'customize-my-account-page-for-woocommerce' );
+					$badge_class  = 'tgwc-dc-badge';
 					$member_price = $regular_price * ( 1 - $disc['amount'] / 100 );
 				}
 			} else {
 				$badge_text   = wc_price( $disc['amount'] ) . ' ' . __( 'off', 'customize-my-account-page-for-woocommerce' );
+				$badge_class  = 'tgwc-dc-badge';
 				$member_price = max( 0, $regular_price - $disc['amount'] );
 			}
 
-			$is_free   = ( $disc['is_pct'] && $disc['amount'] >= 100 );
-			$badge_bg  = $is_free ? '#a2964a' : '#171915';
-
-			// Row
-			echo '<div onclick="window.location.href=\'' . esc_url( $permalink ) . '\'" style="display:flex !important;flex-direction:row !important;align-items:center !important;gap:14px !important;padding:10px 14px !important;border:2px solid rgba(23,25,21,0.1) !important;border-radius:8px !important;background:#fff !important;cursor:pointer !important;box-sizing:border-box !important;transition:border-color .2s,background .2s !important;" onmouseover="this.style.borderColor=\'rgba(162,150,74,0.25)\';this.style.background=\'rgba(162,150,74,0.08)\'" onmouseout="this.style.borderColor=\'rgba(23,25,21,0.1)\';this.style.background=\'#fff\'">';
-
-			// Thumbnail
-			echo '<img src="' . esc_url( $thumb_url ) . '" alt="" style="width:52px !important;height:52px !important;min-width:52px !important;max-width:52px !important;border-radius:6px !important;object-fit:cover !important;display:block !important;flex-shrink:0 !important;margin:0 !important;padding:0 !important;" />';
-
-			// Name
-			echo '<span style="flex:1 1 0% !important;min-width:0 !important;font-family:DM Sans,-apple-system,sans-serif !important;font-size:14px !important;font-weight:500 !important;color:#171915 !important;line-height:1.3 !important;display:block !important;">' . esc_html( $name ) . '</span>';
-
-			// Right side
-			echo '<span style="flex:0 0 auto !important;display:flex !important;flex-direction:column !important;align-items:flex-end !important;gap:2px !important;white-space:nowrap !important;">';
-
-			// Badge
-			echo '<span style="display:inline-block !important;background:' . esc_attr( $badge_bg ) . ' !important;color:#fff !important;padding:2px 10px !important;font-family:DM Sans,-apple-system,sans-serif !important;font-size:10px !important;font-weight:700 !important;text-transform:uppercase !important;letter-spacing:0.06em !important;border-radius:3px !important;line-height:1.6 !important;">' . esc_html( $badge_text ) . '</span>';
-
-			// Prices
-			echo '<span style="display:flex !important;align-items:baseline !important;gap:5px !important;font-family:DM Sans,-apple-system,sans-serif !important;font-size:13px !important;">';
-			if ( $regular_price > 0 ) {
-				echo '<span style="color:rgba(23,25,21,0.5) !important;font-weight:400 !important;font-size:12px !important;"><del>' . wc_price( $regular_price ) . '</del></span>';
-			}
-			echo '<span style="font-weight:700 !important;color:#171915 !important;">' . wc_price( $member_price ) . '</span>';
-			echo '</span>';
-
-			// Via
-			echo '<span style="font-family:DM Sans,-apple-system,sans-serif !important;font-size:10px !important;font-weight:500 !important;text-transform:uppercase !important;letter-spacing:0.06em !important;color:rgba(23,25,21,0.5) !important;display:block !important;">' . esc_html( $disc['plan_name'] ) . '</span>';
-
-			echo '</span>'; // end right side
-			echo '</div>'; // end row
+			echo '<div class="tgwc-dc" onclick="window.location.href=\'' . esc_url( $permalink ) . '\'">';
+				echo '<div class="tgwc-dc-thumb"><img src="' . esc_url( $thumb_url ) . '" alt="" /></div>';
+				echo '<div class="tgwc-dc-body">';
+					echo '<span class="tgwc-dc-name">' . esc_html( $name ) . '</span>';
+					echo '<span class="tgwc-dc-end">';
+						echo '<span class="' . esc_attr( $badge_class ) . '">' . esc_html( $badge_text ) . '</span>';
+						echo '<span class="tgwc-dc-prices">';
+						if ( $regular_price > 0 ) {
+							echo '<del>' . wp_kses_post( wc_price( $regular_price ) ) . '</del>';
+						}
+						echo '<strong>' . wp_kses_post( wc_price( $member_price ) ) . '</strong>';
+						echo '</span>';
+						echo '<span class="tgwc-dc-via">' . esc_html( $disc['plan_name'] ) . '</span>';
+						if ( $product->is_purchasable() && $product->is_in_stock() ) {
+							echo '<a href="' . esc_url( $add_to_cart ) . '" class="tgwc-dc-cart" onclick="event.stopPropagation();">' . esc_html__( 'Add to Cart', 'customize-my-account-page-for-woocommerce' ) . '</a>';
+						}
+					echo '</span>';
+				echo '</div>';
+			echo '</div>';
 		}
 
-		echo '</div>'; // end grid
+		echo '</div>';
 	}
 
 	/**
