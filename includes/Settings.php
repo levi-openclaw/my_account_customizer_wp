@@ -255,6 +255,34 @@ class Settings {
 			$settings['eligibility'][ $rule_key ] = ! empty( $eligibility_input[ $rule_key ] );
 		}
 
+		// Process custom endpoint rules.
+		$raw_rules = isset( $settings['custom_endpoint_rules'] ) ? $settings['custom_endpoint_rules'] : array();
+		$settings['custom_endpoint_rules'] = array();
+		if ( is_array( $raw_rules ) ) {
+			foreach ( $raw_rules as $rule ) {
+				$endpoint    = isset( $rule['endpoint'] ) ? sanitize_text_field( trim( $rule['endpoint'] ) ) : '';
+				$product_ids = isset( $rule['product_ids'] ) ? $rule['product_ids'] : '';
+
+				// Parse comma-separated product IDs.
+				if ( is_string( $product_ids ) ) {
+					$product_ids = array_filter( array_map( 'absint', explode( ',', $product_ids ) ) );
+				} else {
+					$product_ids = array_filter( array_map( 'absint', (array) $product_ids ) );
+				}
+
+				$require_active = ! empty( $rule['require_active'] );
+
+				// Only save non-empty rules.
+				if ( ! empty( $endpoint ) && ! empty( $product_ids ) ) {
+					$settings['custom_endpoint_rules'][] = array(
+						'endpoint'       => $endpoint,
+						'product_ids'    => array_values( $product_ids ),
+						'require_active' => $require_active,
+					);
+				}
+			}
+		}
+
 		$settings = tgwc_parse_args(
 			$settings,
 			array(
@@ -766,6 +794,7 @@ class Settings {
 				'default_endpoint'              => 'dashboard',
 				'enable_debug'                  => false,
 				'eligibility'                   => array(),
+				'custom_endpoint_rules'         => array(),
 				'frontend'                      => array(
 					'fontawesome'      => array(
 						'css' => true,

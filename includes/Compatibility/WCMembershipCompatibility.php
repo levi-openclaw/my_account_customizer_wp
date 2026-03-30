@@ -271,7 +271,7 @@ class WCMembershipCompatibility {
 
 		// --- Tab switching JS ---
 		?>
-		<script id="tgwc-membership-tabs-v2.2.1">
+		<script id="tgwc-membership-tabs-v2.3.0">
 		(function() {
 			var tabs = document.querySelectorAll('.tgwc-membership-tabs .tgwc-membership-tab a');
 			var panels = document.querySelectorAll('.tgwc-membership-tab-panel');
@@ -476,8 +476,8 @@ class WCMembershipCompatibility {
 
 		// Step 2: Render using proven card pattern — scoped styles + clean HTML.
 		?>
-		<style id="tgwc-discount-cards-v2.2.1">
-			/* tgwc-discount-cards v2.2.1 */
+		<style id="tgwc-discount-cards-v2.3.0">
+			/* tgwc-discount-cards v2.3.0 */
 			.tgwc-dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; align-content: start; }
 			.tgwc-dc { display: flex; align-items: center; gap: 14px; padding: 8px 14px 8px 8px; border: 2px solid rgba(23,25,21,0.1); border-radius: 8px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; box-sizing: border-box; transition: border-color .2s, background .2s; }
 			.tgwc-dc:hover { border-color: rgba(162,150,74,0.25); background: rgba(162,150,74,0.08); }
@@ -561,12 +561,12 @@ class WCMembershipCompatibility {
 
 		// AJAX add-to-cart + toast notification.
 		?>
-		<style id="tgwc-cart-toast-v2.2.1">
+		<style id="tgwc-cart-toast-v2.3.0">
 			.tgwc-toast { position: fixed; bottom: 24px; right: 24px; background: #171915; color: #fff; font-family: 'DM Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 8px; z-index: 99999; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; }
 			.tgwc-toast.tgwc-toast--visible { opacity: 1; transform: translateY(0); }
 			.tgwc-dc-cart[disabled] { opacity: 0.5; pointer-events: none; }
 		</style>
-		<script id="tgwc-ajax-cart-v2.2.1">
+		<script id="tgwc-ajax-cart-v2.3.0">
 		function tgwcAddToCart(btn, productId) {
 			var origText = btn.textContent;
 			btn.disabled = true;
@@ -864,8 +864,8 @@ class WCMembershipCompatibility {
 			return;
 		}
 		?>
-		<style id="tgwc-memberships-compat-v2.2.1">
-			/* tgwc-memberships-compat v2.2.1 */
+		<style id="tgwc-memberships-compat-v2.3.0">
+			/* tgwc-memberships-compat v2.3.0 */
 			/* ================================================================
 			   Gamut Design Tokens
 			   ================================================================ */

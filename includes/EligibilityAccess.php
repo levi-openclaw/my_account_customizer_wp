@@ -162,6 +162,10 @@ class EligibilityAccess {
 		$eligibility_settings = $this->get_eligibility_settings();
 		$endpoints_to_hide    = $this->get_ineligible_endpoints( $eligibility_settings );
 
+		// Also apply custom subscription-based endpoint rules.
+		$custom_hide       = $this->get_custom_rule_ineligible_endpoints();
+		$endpoints_to_hide = array_unique( array_merge( $endpoints_to_hide, $custom_hide ) );
+
 		if ( empty( $endpoints_to_hide ) ) {
 			return $endpoints;
 		}
@@ -206,6 +210,100 @@ class EligibilityAccess {
 			// If the user is NOT eligible, mark the endpoint for removal.
 			if ( is_callable( $rule['callback'] ) && ! call_user_func( $rule['callback'] ) ) {
 				$hide[] = $rule['endpoint'];
+			}
+		}
+
+		return $hide;
+	}
+
+	// ------------------------------------------------------------------
+	// Custom Subscription-Based Endpoint Rules
+	// ------------------------------------------------------------------
+
+	/**
+	 * Get the saved custom endpoint rules from settings.
+	 *
+	 * Each rule: { endpoint: string, product_ids: int[], require_active: bool }
+	 *
+	 * @return array
+	 */
+	public function get_custom_endpoint_rules() {
+		$settings = TGWC()->get_settings()->get_settings();
+		return isset( $settings['custom_endpoint_rules'] ) ? $settings['custom_endpoint_rules'] : array();
+	}
+
+	/**
+	 * Check if a user has a subscription for a specific product.
+	 *
+	 * @param int  $product_id     The subscription product ID.
+	 * @param bool $require_active If true, only active/pending-cancel counts.
+	 * @return bool
+	 */
+	private function user_has_subscription_for_product( $product_id, $require_active = false ) {
+		if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
+			return false;
+		}
+
+		$statuses = $require_active
+			? array( 'active', 'pending-cancel' )
+			: array( 'active', 'on-hold', 'pending', 'pending-cancel', 'cancelled', 'expired' );
+
+		$subscriptions = wcs_get_subscriptions(
+			array(
+				'customer_id'            => get_current_user_id(),
+				'subscription_status'    => $statuses,
+				'subscriptions_per_page' => -1,
+			)
+		);
+
+		foreach ( $subscriptions as $subscription ) {
+			foreach ( $subscription->get_items() as $item ) {
+				if ( (int) $item->get_product_id() === (int) $product_id ) {
+					return true;
+				}
+				// Also check variation parent.
+				if ( method_exists( $item, 'get_variation_id' ) && (int) $item->get_variation_id() === (int) $product_id ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get endpoints to hide based on custom subscription rules.
+	 *
+	 * @return array Endpoint slugs to hide.
+	 */
+	private function get_custom_rule_ineligible_endpoints() {
+		$rules = $this->get_custom_endpoint_rules();
+		$hide  = array();
+
+		if ( empty( $rules ) ) {
+			return $hide;
+		}
+
+		foreach ( $rules as $rule ) {
+			$endpoint       = isset( $rule['endpoint'] ) ? sanitize_text_field( $rule['endpoint'] ) : '';
+			$product_ids    = isset( $rule['product_ids'] ) ? array_map( 'absint', (array) $rule['product_ids'] ) : array();
+			$require_active = ! empty( $rule['require_active'] );
+
+			if ( empty( $endpoint ) || empty( $product_ids ) ) {
+				continue;
+			}
+
+			// User must have a subscription for ANY of the listed product IDs.
+			$eligible = false;
+			foreach ( $product_ids as $pid ) {
+				if ( $this->user_has_subscription_for_product( $pid, $require_active ) ) {
+					$eligible = true;
+					break;
+				}
+			}
+
+			if ( ! $eligible ) {
+				$hide[] = $endpoint;
 			}
 		}
 

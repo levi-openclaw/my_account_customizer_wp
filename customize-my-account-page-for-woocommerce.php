@@ -5,7 +5,7 @@
  * Description: Allows you to register custom WooCommerce tabs on my-account page and customize the design.
  * Author: ThemeGrill
  * Author URI: https://themegrill.com
- * Version: 2.2.1
+ * Version: 2.3.0
  * Text Domain: customize-my-account-page-for-woocommerce
  * Domain Path: /languages
  * License: GNU General Public License v3.0
@@ -43,7 +43,7 @@ if ( ! defined( 'TGWC_PLUGIN_FILE' ) ) {
 }
 
 if ( ! defined( 'TGWC_VERSION' ) ) {
-	define( 'TGWC_VERSION', '2.2.1' );
+	define( 'TGWC_VERSION', '2.3.0' );
 }
 
 if ( ! defined( 'TGWC_ABSPATH' ) ) {
