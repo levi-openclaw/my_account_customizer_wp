@@ -169,24 +169,29 @@ class WCMembershipCompatibility {
 		// Remove default WCM rendering so we fully control output.
 		$this->remove_default_members_area_output();
 
-		// Build tab sections. Each section is only rendered if it has content.
-		$tabs = array(
-			'memberships' => array(
-				'label'    => __( 'Memberships', 'customize-my-account-page-for-woocommerce' ),
-				'callback' => array( $this, 'render_memberships_overview' ),
-			),
-			'discounts'   => array(
-				'label'    => __( 'Discounts', 'customize-my-account-page-for-woocommerce' ),
-				'callback' => array( $this, 'render_combined_discounts' ),
-			),
-			'content'     => array(
+		// Build tab sections. Content comes first if available.
+		$has_content = $this->memberships_have_content( $user_memberships );
+
+		$tabs = array();
+
+		if ( $has_content ) {
+			$tabs['content'] = array(
 				'label'    => __( 'Content', 'customize-my-account-page-for-woocommerce' ),
 				'callback' => array( $this, 'render_combined_content' ),
-			),
-			'products'    => array(
-				'label'    => __( 'Products', 'customize-my-account-page-for-woocommerce' ),
-				'callback' => array( $this, 'render_combined_products' ),
-			),
+			);
+		}
+
+		$tabs['memberships'] = array(
+			'label'    => __( 'Memberships', 'customize-my-account-page-for-woocommerce' ),
+			'callback' => array( $this, 'render_memberships_overview' ),
+		);
+		$tabs['discounts'] = array(
+			'label'    => __( 'Discounts', 'customize-my-account-page-for-woocommerce' ),
+			'callback' => array( $this, 'render_combined_discounts' ),
+		);
+		$tabs['products'] = array(
+			'label'    => __( 'Products', 'customize-my-account-page-for-woocommerce' ),
+			'callback' => array( $this, 'render_combined_products' ),
 		);
 
 		$tabs = apply_filters( 'tgwc_membership_unified_tabs', $tabs );
@@ -459,6 +464,42 @@ class WCMembershipCompatibility {
 	}
 
 	/**
+	 * Check whether any of the user's memberships have restricted content.
+	 *
+	 * Lightweight check that returns true as soon as at least one valid
+	 * content item is found (does not build the full list).
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param \WC_Memberships_User_Membership[] $memberships User memberships.
+	 * @return bool
+	 */
+	private function memberships_have_content( $memberships ) {
+		foreach ( $memberships as $membership ) {
+			$plan = $membership->get_plan();
+			if ( ! $plan || ! $membership->is_active() ) {
+				continue;
+			}
+
+			$rules = $plan->get_content_restriction_rules();
+			if ( empty( $rules ) ) {
+				continue;
+			}
+
+			foreach ( $rules as $rule ) {
+				$object_ids = $rule->get_object_ids();
+				foreach ( $object_ids as $object_id ) {
+					$post = get_post( $object_id );
+					if ( $post && 'publish' === $post->post_status ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Render combined content from all memberships.
 	 *
 	 * Aggregates restricted content accessible to the user across all
@@ -645,74 +686,35 @@ class WCMembershipCompatibility {
 		}
 		?>
 		<style id="tgwc-memberships-compat">
-			/* Memberships table cleanup */
+			/* ================================================================
+			   Gamut Design Tokens
+			   ================================================================ */
+			.tgwc-unified-members-area,
 			.woocommerce-MyAccount-content .my_account_memberships {
-				width: 100%;
-				border-collapse: collapse;
+				--brand-olive: #a2964a;
+				--brand-olive-hover: #8a7f3e;
+				--brand-olive-light: rgba(162, 150, 74, 0.08);
+				--brand-olive-border: rgba(162, 150, 74, 0.25);
+				--grass-100: #171915;
+				--grass-80: rgba(23, 25, 21, 0.8);
+				--grass-50: rgba(23, 25, 21, 0.5);
+				--grass-20: rgba(23, 25, 21, 0.2);
+				--grass-10: rgba(23, 25, 21, 0.1);
+				--grass-05: rgba(23, 25, 21, 0.05);
+				--font-serif: 'Cormorant Garamond', Georgia, serif;
+				--font-sans: 'DM Sans', -apple-system, sans-serif;
 			}
 
-			.woocommerce-MyAccount-content .my_account_memberships th,
-			.woocommerce-MyAccount-content .my_account_memberships td {
-				padding: 10px 12px;
-				text-align: left;
-				vertical-align: middle;
-				border-bottom: 1px solid #e5e5e5;
-			}
-
-			.woocommerce-MyAccount-content .my_account_memberships th {
-				font-weight: 600;
-			}
-
-			.woocommerce-MyAccount-content .my_account_memberships tbody tr:last-child td {
-				border-bottom: none;
-			}
-
-			.woocommerce-MyAccount-content .my_account_memberships .membership-actions a {
-				display: inline-block;
-				margin-right: 8px;
-			}
-
-			.woocommerce-MyAccount-content .my_account_memberships .membership-actions a:last-child {
-				margin-right: 0;
-			}
-
-			/* Members area sub-navigation alignment */
-			.woocommerce-MyAccount-content .my-membership-tabs {
-				list-style: none;
-				margin: 0 0 1.5em;
-				padding: 0;
-				display: flex;
-				gap: 0;
-				border-bottom: 2px solid #e5e5e5;
-			}
-
-			.woocommerce-MyAccount-content .my-membership-tabs li {
-				margin: 0;
-			}
-
-			.woocommerce-MyAccount-content .my-membership-tabs li a {
-				display: block;
-				padding: 8px 16px;
-				text-decoration: none;
-				color: inherit;
-				border-bottom: 2px solid transparent;
-				margin-bottom: -2px;
-				transition: border-color 0.2s ease, color 0.2s ease;
-			}
-
-			.woocommerce-MyAccount-content .my-membership-tabs li.active a,
-			.woocommerce-MyAccount-content .my-membership-tabs li a:hover {
-				border-bottom-color: currentColor;
-			}
-
-			/* Membership tab navigation */
+			/* ================================================================
+			   Tab Navigation
+			   ================================================================ */
 			.tgwc-membership-tabs {
 				list-style: none;
-				margin: 0 0 1.5em;
+				margin: 0 0 24px;
 				padding: 0;
 				display: flex;
 				gap: 0;
-				border-bottom: 2px solid #e5e5e5;
+				border-bottom: 2px solid var(--grass-10, rgba(23,25,21,0.1));
 			}
 
 			.tgwc-membership-tabs li {
@@ -721,46 +723,127 @@ class WCMembershipCompatibility {
 
 			.tgwc-membership-tabs li a {
 				display: block;
-				padding: 10px 20px;
+				padding: 7px 12px;
 				text-decoration: none;
-				color: inherit;
-				opacity: 0.6;
+				color: var(--grass-50, rgba(23,25,21,0.5));
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 13px;
+				font-weight: 500;
 				border-bottom: 2px solid transparent;
 				margin-bottom: -2px;
-				transition: border-color 0.2s ease, opacity 0.2s ease;
-				font-weight: 500;
+				border-radius: 6px 6px 0 0;
+				transition: color 0.2s ease, border-color 0.2s ease;
 			}
 
 			.tgwc-membership-tabs li a:hover {
-				opacity: 0.85;
+				color: var(--grass-80, rgba(23,25,21,0.8));
 			}
 
 			.tgwc-membership-tabs li.active a {
-				opacity: 1;
-				border-bottom-color: currentColor;
+				color: var(--brand-olive, #a2964a);
+				border-bottom-color: var(--brand-olive, #a2964a);
 				font-weight: 600;
 			}
 
-			/* Discount product card grid */
+			/* ================================================================
+			   Section Titles
+			   ================================================================ */
+			.tgwc-unified-members-area h3 {
+				font-family: var(--font-serif, 'Cormorant Garamond', serif);
+				font-size: 26px;
+				font-weight: 600;
+				color: var(--grass-100, #171915);
+				margin: 0 0 16px;
+			}
+
+			/* ================================================================
+			   Tables (Memberships overview, Content, Products)
+			   ================================================================ */
+			.tgwc-unified-members-area .shop_table,
+			.woocommerce-MyAccount-content .my_account_memberships {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 1.5em;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+			}
+
+			.tgwc-unified-members-area .shop_table th,
+			.woocommerce-MyAccount-content .my_account_memberships th {
+				font-size: 11px;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--grass-50, rgba(23,25,21,0.5));
+				border-bottom: 2px solid var(--grass-10, rgba(23,25,21,0.1));
+				padding: 10px 12px;
+				text-align: left;
+			}
+
+			.tgwc-unified-members-area .shop_table td,
+			.woocommerce-MyAccount-content .my_account_memberships td {
+				padding: 12px;
+				text-align: left;
+				vertical-align: middle;
+				border-bottom: 1px solid var(--grass-05, rgba(23,25,21,0.05));
+				color: var(--grass-80, rgba(23,25,21,0.8));
+				font-size: 14px;
+			}
+
+			.tgwc-unified-members-area .shop_table tbody tr:last-child td,
+			.woocommerce-MyAccount-content .my_account_memberships tbody tr:last-child td {
+				border-bottom: none;
+			}
+
+			.tgwc-unified-members-area .shop_table a {
+				color: var(--brand-olive, #a2964a);
+				text-decoration: none;
+				font-weight: 500;
+			}
+
+			.tgwc-unified-members-area .shop_table a:hover {
+				color: var(--brand-olive-hover, #8a7f3e);
+			}
+
+			/* Table view button */
+			.tgwc-unified-members-area .shop_table .woocommerce-button.button {
+				padding: 6px 16px;
+				border: 1px solid var(--grass-20, rgba(23,25,21,0.2));
+				border-radius: 6px;
+				background: none;
+				color: var(--grass-80, rgba(23,25,21,0.8));
+				font-size: 13px;
+				font-weight: 500;
+				text-decoration: none;
+				transition: background 0.15s ease, border-color 0.15s ease;
+			}
+
+			.tgwc-unified-members-area .shop_table .woocommerce-button.button:hover {
+				background: var(--brand-olive-light, rgba(162,150,74,0.08));
+				border-color: var(--brand-olive-border, rgba(162,150,74,0.25));
+				color: var(--brand-olive, #a2964a);
+			}
+
+			/* ================================================================
+			   Discount Product Card Grid
+			   ================================================================ */
 			.tgwc-discount-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-				gap: 20px;
-				margin-top: 0.5em;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+				gap: 16px;
 			}
 
 			.tgwc-discount-card {
 				position: relative;
-				border: 1px solid #e5e5e5;
+				border: 2px solid var(--grass-10, rgba(23,25,21,0.1));
 				border-radius: 8px;
 				overflow: hidden;
-				transition: box-shadow 0.2s ease, transform 0.15s ease;
 				background: #fff;
+				transition: border-color 0.2s ease, background 0.2s ease;
 			}
 
 			.tgwc-discount-card:hover {
-				box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-				transform: translateY(-2px);
+				border-color: var(--brand-olive-border, rgba(162,150,74,0.25));
+				background: var(--brand-olive-light, rgba(162,150,74,0.08));
 			}
 
 			.tgwc-discount-card-link {
@@ -769,25 +852,28 @@ class WCMembershipCompatibility {
 				color: inherit;
 			}
 
+			/* Badge */
 			.tgwc-discount-badge {
 				position: absolute;
 				top: 10px;
 				left: 10px;
-				background: #2d2d2d;
+				background: var(--grass-100, #171915);
 				color: #fff;
-				font-size: 0.75em;
+				padding: 2px 10px;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 10px;
 				font-weight: 700;
-				padding: 3px 10px;
-				border-radius: 4px;
-				z-index: 1;
 				text-transform: uppercase;
-				letter-spacing: 0.02em;
+				letter-spacing: 0.06em;
+				border-radius: 3px;
+				z-index: 1;
 			}
 
+			/* Image */
 			.tgwc-discount-card-image {
-				aspect-ratio: 1 / 1;
+				aspect-ratio: 4 / 3;
 				overflow: hidden;
-				background: #f5f5f5;
+				background: var(--grass-05, rgba(23,25,21,0.05));
 			}
 
 			.tgwc-discount-card-image img {
@@ -797,93 +883,90 @@ class WCMembershipCompatibility {
 				display: block;
 			}
 
+			/* Card info */
 			.tgwc-discount-card-info {
-				padding: 12px 14px 16px;
+				padding: 14px 16px 18px;
 			}
 
 			.tgwc-discount-card-title {
-				margin: 0 0 6px;
-				font-size: 0.95em;
+				margin: 0 0 8px;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 14px;
 				font-weight: 600;
-				line-height: 1.3;
+				line-height: 1.35;
+				color: var(--grass-100, #171915);
 			}
 
+			/* Prices */
 			.tgwc-discount-card-prices {
-				margin-bottom: 4px;
-				font-size: 0.9em;
+				margin-bottom: 6px;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 14px;
+				display: flex;
+				align-items: baseline;
+				gap: 6px;
 			}
 
 			.tgwc-price-original {
-				opacity: 0.5;
-				margin-right: 4px;
+				color: var(--grass-50, rgba(23,25,21,0.5));
+				font-weight: 400;
+			}
+
+			.tgwc-price-original del {
+				text-decoration: line-through;
 			}
 
 			.tgwc-price-member {
 				font-weight: 700;
+				color: var(--grass-100, #171915);
 			}
 
+			/* Membership source */
 			.tgwc-discount-card-via {
 				display: block;
-				font-size: 0.78em;
-				opacity: 0.5;
-				margin-top: 2px;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 11px;
+				font-weight: 500;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--grass-50, rgba(23,25,21,0.5));
+				margin-top: 4px;
 			}
 
-			@media screen and (max-width: 480px) {
-				.tgwc-discount-grid {
-					grid-template-columns: repeat(2, 1fr);
-					gap: 12px;
-				}
-			}
-
-			/* Unified members area sections */
-			.tgwc-unified-members-area h3 {
-				margin: 1.5em 0 0.75em;
-				font-size: 1.15em;
-				font-weight: 600;
-			}
-
-			.tgwc-unified-members-area h3:first-child {
-				margin-top: 0;
-			}
-
-			.tgwc-unified-members-area .shop_table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-bottom: 1.5em;
-			}
-
-			.tgwc-unified-members-area .shop_table th,
-			.tgwc-unified-members-area .shop_table td {
-				padding: 10px 12px;
-				text-align: left;
-				vertical-align: middle;
-				border-bottom: 1px solid #e5e5e5;
-			}
-
-			.tgwc-unified-members-area .shop_table th {
-				font-weight: 600;
-			}
-
-			.tgwc-unified-members-area .shop_table tbody tr:last-child td {
-				border-bottom: none;
-			}
-
-			.tgwc-unified-members-area .shop_table a {
-				color: inherit;
-			}
-
-			.tgwc-unified-members-area .tgwc-discounts-table td:nth-child(2) {
-				font-weight: 600;
-			}
-
-			/* Responsive */
+			/* ================================================================
+			   Responsive
+			   ================================================================ */
 			@media screen and (max-width: 768px) {
 				.woocommerce-MyAccount-content .my_account_memberships,
 				.tgwc-unified-members-area .shop_table {
 					display: block;
 					overflow-x: auto;
 					-webkit-overflow-scrolling: touch;
+				}
+
+				.tgwc-membership-tabs {
+					overflow-x: auto;
+					-webkit-overflow-scrolling: touch;
+					flex-wrap: nowrap;
+				}
+
+				.tgwc-membership-tabs li a {
+					white-space: nowrap;
+				}
+			}
+
+			@media screen and (max-width: 480px) {
+				.tgwc-discount-grid {
+					grid-template-columns: repeat(2, 1fr);
+					gap: 10px;
+				}
+
+				.tgwc-discount-card-info {
+					padding: 10px 12px 14px;
+				}
+
+				.tgwc-discount-card-title {
+					font-size: 13px;
 				}
 			}
 		</style>
