@@ -76,8 +76,11 @@ class WCSubscriptionsCompatibility {
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'rename_subscriptions_nav_item' ), 20 );
 
 		// 2. Add product-name column to the subscriptions table.
+		// Hook both filter names to cover all WooCommerce Subscriptions versions.
 		add_filter( 'woocommerce_my_subscriptions_columns', array( $this, 'add_plan_column' ) );
+		add_filter( 'wcs_get_my_subscriptions_columns', array( $this, 'add_plan_column' ) );
 		add_action( 'woocommerce_my_subscriptions_column_subscription-name', array( $this, 'render_plan_column' ) );
+		add_action( 'wcs_my_subscriptions_column_subscription-name', array( $this, 'render_plan_column' ) );
 
 		// 3. Front-end CSS for the subscriptions table.
 		add_action( 'wp_head', array( $this, 'output_frontend_css' ) );
