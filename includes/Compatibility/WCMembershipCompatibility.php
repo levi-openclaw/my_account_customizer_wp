@@ -795,12 +795,12 @@ class WCMembershipCompatibility {
 				color: var(--brand-olive-hover, #8a7f3e);
 			}
 
-			/* Table view button — dark default, olive hover */
+			/* Table view button — olive primary */
 			.tgwc-unified-members-area .shop_table .woocommerce-button.button {
 				padding: 10px 28px;
 				border: none;
 				border-radius: 6px;
-				background: var(--grass-100, #171915);
+				background: var(--brand-olive, #a2964a);
 				color: #fff;
 				font-family: var(--font-sans, 'DM Sans', sans-serif);
 				font-size: 14px;
@@ -811,7 +811,7 @@ class WCMembershipCompatibility {
 			}
 
 			.tgwc-unified-members-area .shop_table .woocommerce-button.button:hover {
-				background: var(--brand-olive, #a2964a);
+				background: var(--brand-olive-hover, #8a7f3e);
 				color: #fff;
 			}
 
