@@ -415,7 +415,10 @@ class WCMembershipCompatibility {
 			$name          = $product->get_name();
 			$permalink     = $product->get_permalink();
 			$regular_price = (float) $product->get_regular_price();
-			$thumb         = $product->get_image( 'thumbnail', array( 'class' => 'tgwc-discount-thumb' ) );
+
+			// Get raw image URL to avoid WooCommerce img classes that theme overrides.
+			$thumb_id  = $product->get_image_id();
+			$thumb_url = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' ) : wc_placeholder_img_src( 'thumbnail' );
 
 			// Calculate member price and badge.
 			if ( $disc['is_pct'] ) {
@@ -433,27 +436,20 @@ class WCMembershipCompatibility {
 
 			$is_free = ( $disc['is_pct'] && $disc['amount'] >= 100 );
 
-			echo '<a href="' . esc_url( $permalink ) . '" class="tgwc-discount-row">';
-
-			// Thumbnail
-			echo '<div class="tgwc-discount-row-thumb">' . $thumb . '</div>';
-
-			// Name
-			echo '<div class="tgwc-discount-row-name">' . esc_html( $name ) . '</div>';
-
-			// Right side: badge + prices
-			echo '<div class="tgwc-discount-row-end">';
+			echo '<div class="tgwc-discount-row" onclick="window.location.href=\'' . esc_url( $permalink ) . '\'" style="cursor:pointer;">';
+			echo '<img class="tgwc-discount-row-img" src="' . esc_url( $thumb_url ) . '" alt="' . esc_attr( $name ) . '" />';
+			echo '<span class="tgwc-discount-row-name">' . esc_html( $name ) . '</span>';
+			echo '<span class="tgwc-discount-row-end">';
 			echo '<span class="tgwc-discount-badge' . ( $is_free ? ' tgwc-discount-badge--free' : '' ) . '">' . esc_html( $badge_text ) . '</span>';
-			echo '<div class="tgwc-discount-row-prices">';
+			echo '<span class="tgwc-discount-row-prices">';
 			if ( $regular_price > 0 ) {
 				echo '<span class="tgwc-price-original"><del>' . wc_price( $regular_price ) . '</del></span>';
 			}
 			echo '<span class="tgwc-price-member">' . wc_price( $member_price ) . '</span>';
-			echo '</div>';
+			echo '</span>';
 			echo '<span class="tgwc-discount-row-via">' . esc_html( $disc['plan_name'] ) . '</span>';
+			echo '</span>';
 			echo '</div>';
-
-			echo '</a>';
 		}
 
 		echo '</div>'; // list
@@ -818,124 +814,117 @@ class WCMembershipCompatibility {
 			/* ================================================================
 			   Discount Product List (horizontal rows)
 			   ================================================================ */
-			.tgwc-discount-list {
+			div.tgwc-discount-list {
 				display: grid !important;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 10px;
+				grid-template-columns: repeat(2, 1fr) !important;
+				gap: 10px !important;
 			}
 
-			.tgwc-discount-row {
+			div.tgwc-discount-row {
 				display: flex !important;
 				flex-direction: row !important;
 				align-items: center !important;
-				gap: 14px;
-				padding: 10px 14px;
-				border: 2px solid var(--grass-10, rgba(23,25,21,0.1));
-				border-radius: 8px;
-				background: #fff;
+				flex-wrap: nowrap !important;
+				gap: 14px !important;
+				padding: 10px 14px !important;
+				border: 2px solid rgba(23,25,21,0.1) !important;
+				border-radius: 8px !important;
+				background: #fff !important;
 				text-decoration: none !important;
-				color: inherit !important;
-				transition: border-color 0.2s ease, background 0.2s ease;
-				min-height: 72px;
-				box-sizing: border-box;
+				color: #171915 !important;
+				transition: border-color 0.2s ease, background 0.2s ease !important;
+				box-sizing: border-box !important;
 			}
 
-			.tgwc-discount-row:hover {
-				border-color: var(--brand-olive-border, rgba(162,150,74,0.25));
-				background: var(--brand-olive-light, rgba(162,150,74,0.08));
+			div.tgwc-discount-row:hover {
+				border-color: rgba(162,150,74,0.25) !important;
+				background: rgba(162,150,74,0.08) !important;
 			}
 
-			/* Thumbnail */
-			.tgwc-discount-row-thumb {
-				flex: 0 0 52px !important;
+			/* Thumbnail — plain img, no WC classes */
+			img.tgwc-discount-row-img {
 				width: 52px !important;
 				height: 52px !important;
-				border-radius: 6px;
-				overflow: hidden;
-				background: var(--grass-05, rgba(23,25,21,0.05));
-			}
-
-			.tgwc-discount-row-thumb img {
-				width: 52px !important;
-				height: 52px !important;
+				min-width: 52px !important;
 				max-width: 52px !important;
-				object-fit: cover;
+				border-radius: 6px !important;
+				object-fit: cover !important;
 				display: block !important;
+				flex-shrink: 0 !important;
+				margin: 0 !important;
+				padding: 0 !important;
 			}
 
 			/* Product name */
-			.tgwc-discount-row-name {
+			span.tgwc-discount-row-name {
 				flex: 1 1 0% !important;
-				min-width: 0;
-				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 14px;
-				font-weight: 500;
-				color: var(--grass-100, #171915);
-				line-height: 1.3;
-				overflow: hidden;
-				text-overflow: ellipsis;
+				min-width: 0 !important;
+				font-family: 'DM Sans', -apple-system, sans-serif !important;
+				font-size: 14px !important;
+				font-weight: 500 !important;
+				color: #171915 !important;
+				line-height: 1.3 !important;
+				display: block !important;
 			}
 
 			/* Right side (badge, price, via) */
-			.tgwc-discount-row-end {
+			span.tgwc-discount-row-end {
 				flex: 0 0 auto !important;
 				display: flex !important;
 				flex-direction: column !important;
 				align-items: flex-end !important;
-				gap: 2px;
-				white-space: nowrap;
+				gap: 2px !important;
+				white-space: nowrap !important;
 			}
 
 			/* Badge */
-			.tgwc-discount-badge {
-				display: inline-block;
-				background: var(--grass-100, #171915);
-				color: #fff;
-				padding: 2px 10px;
-				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 10px;
-				font-weight: 700;
-				text-transform: uppercase;
-				letter-spacing: 0.06em;
-				border-radius: 3px;
+			span.tgwc-discount-badge {
+				display: inline-block !important;
+				background: #171915 !important;
+				color: #fff !important;
+				padding: 2px 10px !important;
+				font-family: 'DM Sans', -apple-system, sans-serif !important;
+				font-size: 10px !important;
+				font-weight: 700 !important;
+				text-transform: uppercase !important;
+				letter-spacing: 0.06em !important;
+				border-radius: 3px !important;
+				line-height: 1.6 !important;
 			}
 
-			.tgwc-discount-badge--free {
-				background: var(--brand-olive, #a2964a);
+			span.tgwc-discount-badge--free {
+				background: #a2964a !important;
 			}
 
 			/* Prices */
-			.tgwc-discount-row-prices {
-				display: flex;
-				align-items: baseline;
-				gap: 5px;
-				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 13px;
+			span.tgwc-discount-row-prices {
+				display: flex !important;
+				align-items: baseline !important;
+				gap: 5px !important;
+				font-family: 'DM Sans', -apple-system, sans-serif !important;
+				font-size: 13px !important;
 			}
 
-			.tgwc-price-original {
-				color: var(--grass-50, rgba(23,25,21,0.5));
-				font-weight: 400;
-				font-size: 12px;
+			.tgwc-discount-row .tgwc-price-original {
+				color: rgba(23,25,21,0.5) !important;
+				font-weight: 400 !important;
+				font-size: 12px !important;
 			}
 
-			.tgwc-price-original del {
-				text-decoration: line-through;
-			}
-
-			.tgwc-price-member {
-				font-weight: 700;
-				color: var(--grass-100, #171915);
+			.tgwc-discount-row .tgwc-price-member {
+				font-weight: 700 !important;
+				color: #171915 !important;
 			}
 
 			/* Via label */
-			.tgwc-discount-row-via {
-				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 10px;
-				font-weight: 500;
-				text-transform: uppercase;
-				letter-spacing: 0.06em;
-				color: var(--grass-50, rgba(23,25,21,0.5));
+			span.tgwc-discount-row-via {
+				font-family: 'DM Sans', -apple-system, sans-serif !important;
+				font-size: 10px !important;
+				font-weight: 500 !important;
+				text-transform: uppercase !important;
+				letter-spacing: 0.06em !important;
+				color: rgba(23,25,21,0.5) !important;
+				display: block !important;
 			}
 
 			/* ================================================================
