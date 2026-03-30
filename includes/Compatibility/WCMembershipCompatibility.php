@@ -403,8 +403,8 @@ class WCMembershipCompatibility {
 			return;
 		}
 
-		// Step 2: Render as product card grid.
-		echo '<div class="tgwc-discount-grid">';
+		// Step 2: Render as horizontal list items (thumbnail | name | badge + price).
+		echo '<div class="tgwc-discount-list">';
 
 		foreach ( $product_discounts as $product_id => $disc ) {
 			$product = wc_get_product( $product_id );
@@ -415,9 +415,9 @@ class WCMembershipCompatibility {
 			$name          = $product->get_name();
 			$permalink     = $product->get_permalink();
 			$regular_price = (float) $product->get_regular_price();
-			$image         = $product->get_image( 'woocommerce_thumbnail', array( 'class' => 'tgwc-discount-card-img' ) );
+			$thumb         = $product->get_image( 'thumbnail', array( 'class' => 'tgwc-discount-thumb' ) );
 
-			// Calculate member price.
+			// Calculate member price and badge.
 			if ( $disc['is_pct'] ) {
 				if ( $disc['amount'] >= 100 ) {
 					$badge_text   = __( 'FREE', 'customize-my-account-page-for-woocommerce' );
@@ -431,36 +431,32 @@ class WCMembershipCompatibility {
 				$member_price = max( 0, $regular_price - $disc['amount'] );
 			}
 
-			echo '<div class="tgwc-discount-card">';
-			echo '<a href="' . esc_url( $permalink ) . '" class="tgwc-discount-card-link">';
+			$is_free = ( $disc['is_pct'] && $disc['amount'] >= 100 );
 
-			// Badge
-			echo '<span class="tgwc-discount-badge">' . esc_html( $badge_text ) . '</span>';
+			echo '<a href="' . esc_url( $permalink ) . '" class="tgwc-discount-row">';
 
-			// Image
-			echo '<div class="tgwc-discount-card-image">' . $image . '</div>';
+			// Thumbnail
+			echo '<div class="tgwc-discount-row-thumb">' . $thumb . '</div>';
 
-			// Info
-			echo '<div class="tgwc-discount-card-info">';
-			echo '<h4 class="tgwc-discount-card-title">' . esc_html( $name ) . '</h4>';
+			// Name
+			echo '<div class="tgwc-discount-row-name">' . esc_html( $name ) . '</div>';
 
-			// Prices
-			echo '<div class="tgwc-discount-card-prices">';
+			// Right side: badge + prices
+			echo '<div class="tgwc-discount-row-end">';
+			echo '<span class="tgwc-discount-badge' . ( $is_free ? ' tgwc-discount-badge--free' : '' ) . '">' . esc_html( $badge_text ) . '</span>';
+			echo '<div class="tgwc-discount-row-prices">';
 			if ( $regular_price > 0 ) {
-				echo '<span class="tgwc-price-original"><del>' . wc_price( $regular_price ) . '</del></span> ';
+				echo '<span class="tgwc-price-original"><del>' . wc_price( $regular_price ) . '</del></span>';
 			}
 			echo '<span class="tgwc-price-member">' . wc_price( $member_price ) . '</span>';
 			echo '</div>';
+			echo '<span class="tgwc-discount-row-via">' . esc_html( $disc['plan_name'] ) . '</span>';
+			echo '</div>';
 
-			// Membership source
-			echo '<span class="tgwc-discount-card-via">' . esc_html( $disc['plan_name'] ) . '</span>';
-
-			echo '</div>'; // card-info
 			echo '</a>';
-			echo '</div>'; // card
 		}
 
-		echo '</div>'; // grid
+		echo '</div>'; // list
 	}
 
 	/**
@@ -565,18 +561,13 @@ class WCMembershipCompatibility {
 		echo '<h3>' . esc_html__( 'Your Content', 'customize-my-account-page-for-woocommerce' ) . '</h3>';
 		echo '<table class="shop_table tgwc-content-table"><thead><tr>';
 		echo '<th>' . esc_html__( 'Title', 'customize-my-account-page-for-woocommerce' ) . '</th>';
-		echo '<th>' . esc_html__( 'Type', 'customize-my-account-page-for-woocommerce' ) . '</th>';
 		echo '<th>' . esc_html__( 'Excerpt', 'customize-my-account-page-for-woocommerce' ) . '</th>';
 		echo '<th></th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $content_items as $item ) {
-			$type_label = get_post_type_object( $item['type'] );
-			$type_label = $type_label ? $type_label->labels->singular_name : ucfirst( $item['type'] );
-
 			echo '<tr>';
 			echo '<td><a href="' . esc_url( $item['url'] ) . '">' . esc_html( $item['title'] ) . '</a></td>';
-			echo '<td>' . esc_html( $type_label ) . '</td>';
 			echo '<td>' . esc_html( $item['excerpt'] ) . '</td>';
 			echo '<td><a href="' . esc_url( $item['url'] ) . '" class="woocommerce-button button">' . esc_html__( 'View', 'customize-my-account-page-for-woocommerce' ) . '</a></td>';
 			echo '</tr>';
@@ -804,59 +795,93 @@ class WCMembershipCompatibility {
 				color: var(--brand-olive-hover, #8a7f3e);
 			}
 
-			/* Table view button */
+			/* Table view button — olive primary */
 			.tgwc-unified-members-area .shop_table .woocommerce-button.button {
-				padding: 6px 16px;
-				border: 1px solid var(--grass-20, rgba(23,25,21,0.2));
+				padding: 10px 28px;
+				border: none;
 				border-radius: 6px;
-				background: none;
-				color: var(--grass-80, rgba(23,25,21,0.8));
-				font-size: 13px;
-				font-weight: 500;
+				background: var(--brand-olive, #a2964a);
+				color: #fff;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 14px;
+				font-weight: 600;
 				text-decoration: none;
-				transition: background 0.15s ease, border-color 0.15s ease;
+				transition: background 0.15s ease;
+				display: inline-block;
 			}
 
 			.tgwc-unified-members-area .shop_table .woocommerce-button.button:hover {
-				background: var(--brand-olive-light, rgba(162,150,74,0.08));
-				border-color: var(--brand-olive-border, rgba(162,150,74,0.25));
-				color: var(--brand-olive, #a2964a);
+				background: var(--brand-olive-hover, #8a7f3e);
+				color: #fff;
 			}
 
 			/* ================================================================
-			   Discount Product Card Grid
+			   Discount Product List (horizontal rows)
 			   ================================================================ */
-			.tgwc-discount-grid {
+			.tgwc-discount-list {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-				gap: 16px;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 10px;
 			}
 
-			.tgwc-discount-card {
-				position: relative;
+			.tgwc-discount-row {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 10px 14px;
 				border: 2px solid var(--grass-10, rgba(23,25,21,0.1));
 				border-radius: 8px;
-				overflow: hidden;
 				background: #fff;
+				text-decoration: none;
+				color: inherit;
 				transition: border-color 0.2s ease, background 0.2s ease;
 			}
 
-			.tgwc-discount-card:hover {
+			.tgwc-discount-row:hover {
 				border-color: var(--brand-olive-border, rgba(162,150,74,0.25));
 				background: var(--brand-olive-light, rgba(162,150,74,0.08));
 			}
 
-			.tgwc-discount-card-link {
+			/* Thumbnail */
+			.tgwc-discount-row-thumb {
+				flex: 0 0 52px;
+				width: 52px;
+				height: 52px;
+				border-radius: 6px;
+				overflow: hidden;
+				background: var(--grass-05, rgba(23,25,21,0.05));
+			}
+
+			.tgwc-discount-row-thumb img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
 				display: block;
-				text-decoration: none;
-				color: inherit;
+			}
+
+			/* Product name */
+			.tgwc-discount-row-name {
+				flex: 1;
+				min-width: 0;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 14px;
+				font-weight: 500;
+				color: var(--grass-100, #171915);
+				line-height: 1.3;
+			}
+
+			/* Right side (badge, price, via) */
+			.tgwc-discount-row-end {
+				flex: 0 0 auto;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: 2px;
 			}
 
 			/* Badge */
 			.tgwc-discount-badge {
-				position: absolute;
-				top: 10px;
-				left: 10px;
+				display: inline-block;
 				background: var(--grass-100, #171915);
 				color: #fff;
 				padding: 2px 10px;
@@ -866,50 +891,25 @@ class WCMembershipCompatibility {
 				text-transform: uppercase;
 				letter-spacing: 0.06em;
 				border-radius: 3px;
-				z-index: 1;
 			}
 
-			/* Image */
-			.tgwc-discount-card-image {
-				aspect-ratio: 4 / 3;
-				overflow: hidden;
-				background: var(--grass-05, rgba(23,25,21,0.05));
-			}
-
-			.tgwc-discount-card-image img {
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-				display: block;
-			}
-
-			/* Card info */
-			.tgwc-discount-card-info {
-				padding: 14px 16px 18px;
-			}
-
-			.tgwc-discount-card-title {
-				margin: 0 0 8px;
-				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 14px;
-				font-weight: 600;
-				line-height: 1.35;
-				color: var(--grass-100, #171915);
+			.tgwc-discount-badge--free {
+				background: var(--brand-olive, #a2964a);
 			}
 
 			/* Prices */
-			.tgwc-discount-card-prices {
-				margin-bottom: 6px;
-				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 14px;
+			.tgwc-discount-row-prices {
 				display: flex;
 				align-items: baseline;
-				gap: 6px;
+				gap: 5px;
+				font-family: var(--font-sans, 'DM Sans', sans-serif);
+				font-size: 13px;
 			}
 
 			.tgwc-price-original {
 				color: var(--grass-50, rgba(23,25,21,0.5));
 				font-weight: 400;
+				font-size: 12px;
 			}
 
 			.tgwc-price-original del {
@@ -921,16 +921,14 @@ class WCMembershipCompatibility {
 				color: var(--grass-100, #171915);
 			}
 
-			/* Membership source */
-			.tgwc-discount-card-via {
-				display: block;
+			/* Via label */
+			.tgwc-discount-row-via {
 				font-family: var(--font-sans, 'DM Sans', sans-serif);
-				font-size: 11px;
+				font-size: 10px;
 				font-weight: 500;
 				text-transform: uppercase;
 				letter-spacing: 0.06em;
 				color: var(--grass-50, rgba(23,25,21,0.5));
-				margin-top: 4px;
 			}
 
 			/* ================================================================
@@ -953,19 +951,25 @@ class WCMembershipCompatibility {
 				.tgwc-membership-tabs li a {
 					white-space: nowrap;
 				}
+
+				.tgwc-discount-list {
+					grid-template-columns: 1fr;
+				}
 			}
 
 			@media screen and (max-width: 480px) {
-				.tgwc-discount-grid {
-					grid-template-columns: repeat(2, 1fr);
+				.tgwc-discount-row {
 					gap: 10px;
+					padding: 8px 10px;
 				}
 
-				.tgwc-discount-card-info {
-					padding: 10px 12px 14px;
+				.tgwc-discount-row-thumb {
+					flex: 0 0 40px;
+					width: 40px;
+					height: 40px;
 				}
 
-				.tgwc-discount-card-title {
+				.tgwc-discount-row-name {
 					font-size: 13px;
 				}
 			}
