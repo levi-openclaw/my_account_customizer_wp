@@ -55,6 +55,7 @@ class WCMembershipCompatibility {
 	private function __construct() {
 		$this->setup();
 		add_action( 'tgwc_my_account_menu_item', array( $this, 'wc_membership_navigation' ), 1 );
+		add_action( 'wp_head', array( $this, 'output_membership_css' ) );
 	}
 
 	/**
@@ -79,6 +80,90 @@ class WCMembershipCompatibility {
 		} else {
 			$this->members_area = $wc_membership_frontend_instance->get_members_area_instance();
 		}
+	}
+
+	/**
+	 * Output front-end CSS to clean up the memberships table on the account page.
+	 *
+	 * @since 2.1.0
+	 * @return void
+	 */
+	public function output_membership_css() {
+		if ( ! function_exists( 'is_account_page' ) || ! is_account_page() ) {
+			return;
+		}
+		?>
+		<style id="tgwc-memberships-compat">
+			/* Memberships table cleanup */
+			.woocommerce-MyAccount-content .my_account_memberships {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			.woocommerce-MyAccount-content .my_account_memberships th,
+			.woocommerce-MyAccount-content .my_account_memberships td {
+				padding: 10px 12px;
+				text-align: left;
+				vertical-align: middle;
+				border-bottom: 1px solid #e5e5e5;
+			}
+
+			.woocommerce-MyAccount-content .my_account_memberships th {
+				font-weight: 600;
+			}
+
+			.woocommerce-MyAccount-content .my_account_memberships tbody tr:last-child td {
+				border-bottom: none;
+			}
+
+			.woocommerce-MyAccount-content .my_account_memberships .membership-actions a {
+				display: inline-block;
+				margin-right: 8px;
+			}
+
+			.woocommerce-MyAccount-content .my_account_memberships .membership-actions a:last-child {
+				margin-right: 0;
+			}
+
+			/* Members area sub-navigation alignment */
+			.woocommerce-MyAccount-content .my-membership-tabs {
+				list-style: none;
+				margin: 0 0 1.5em;
+				padding: 0;
+				display: flex;
+				gap: 0;
+				border-bottom: 2px solid #e5e5e5;
+			}
+
+			.woocommerce-MyAccount-content .my-membership-tabs li {
+				margin: 0;
+			}
+
+			.woocommerce-MyAccount-content .my-membership-tabs li a {
+				display: block;
+				padding: 8px 16px;
+				text-decoration: none;
+				color: inherit;
+				border-bottom: 2px solid transparent;
+				margin-bottom: -2px;
+				transition: border-color 0.2s ease, color 0.2s ease;
+			}
+
+			.woocommerce-MyAccount-content .my-membership-tabs li.active a,
+			.woocommerce-MyAccount-content .my-membership-tabs li a:hover {
+				border-bottom-color: currentColor;
+			}
+
+			/* Responsive memberships table */
+			@media screen and (max-width: 768px) {
+				.woocommerce-MyAccount-content .my_account_memberships {
+					display: block;
+					overflow-x: auto;
+					-webkit-overflow-scrolling: touch;
+				}
+			}
+		</style>
+		<?php
 	}
 
 	/**
