@@ -186,15 +186,24 @@ class EligibilityAccess {
 	// ------------------------------------------------------------------
 
 	/**
-	 * Check if user has any subscriptions.
+	 * Check if user has any subscriptions (including cancelled/expired).
+	 *
+	 * Includes all statuses so users with cancelled or expired subscriptions
+	 * can still see the tab and resubscribe.
 	 *
 	 * @return bool
 	 */
 	public function user_has_subscriptions() {
-		if ( ! function_exists( 'wcs_get_users_subscriptions' ) ) {
+		if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
 			return false;
 		}
-		$subscriptions = wcs_get_users_subscriptions( get_current_user_id() );
+		$subscriptions = wcs_get_subscriptions(
+			array(
+				'customer_id'       => get_current_user_id(),
+				'subscription_status' => array( 'active', 'on-hold', 'pending', 'pending-cancel', 'cancelled', 'expired' ),
+				'subscriptions_per_page' => 1,
+			)
+		);
 		return ! empty( $subscriptions );
 	}
 
