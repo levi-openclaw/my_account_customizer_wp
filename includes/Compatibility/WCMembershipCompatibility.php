@@ -57,16 +57,20 @@ class WCMembershipCompatibility {
 		add_action( 'tgwc_my_account_menu_item', array( $this, 'wc_membership_navigation' ), 1 );
 		add_action( 'wp_head', array( $this, 'output_membership_css' ) );
 
-		// Always show the memberships list table first, even when the user
-		// has only one membership. This prevents the auto-redirect into a
-		// single membership's detail view.
+		// Prevent WCM from redirecting single-membership users to the detail view.
 		add_filter( 'wc_memberships_redirect_single_membership', '__return_false' );
-		add_filter( 'wc_memberships_members_area_my-memberships-section-args', array( $this, 'force_memberships_list' ) );
+		add_action( 'template_redirect', array( $this, 'block_membership_redirect' ), 0 );
 
-		// Render unified members area (combined content, discounts, products
-		// across all memberships) when visiting the members-area endpoint
-		// without a specific membership ID.
-		add_action( 'woocommerce_account_members-area_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
+		// Render unified members area. Hook the actual endpoint slug (which
+		// may differ from 'members-area' based on WCM settings).
+		$endpoint_slug = function_exists( 'wc_memberships_get_members_area_endpoint' )
+			? wc_memberships_get_members_area_endpoint()
+			: 'members-area';
+		add_action( 'woocommerce_account_' . $endpoint_slug . '_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
+		// Also hook the internal key used by this plugin.
+		if ( 'members-area' !== $endpoint_slug ) {
+			add_action( 'woocommerce_account_members-area_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
+		}
 	}
 
 	/**
@@ -94,6 +98,45 @@ class WCMembershipCompatibility {
 	}
 
 	/**
+	 * Block WooCommerce Memberships from redirecting to a single membership's
+	 * detail view. WCM hooks into template_redirect to auto-redirect users
+	 * who have exactly one membership. We remove that redirect so the unified
+	 * view can render instead.
+	 *
+	 * @since 2.1.0
+	 * @return void
+	 */
+	public function block_membership_redirect() {
+		if ( empty( $this->members_area ) ) {
+			return;
+		}
+
+		// Remove WCM's template_redirect handlers that cause the single-membership redirect.
+		// The method name varies by WCM version.
+		$redirect_methods = array(
+			'redirect_to_members_area',
+			'redirect_to_member_area',
+			'maybe_redirect_to_members_area',
+		);
+
+		global $wp_filter;
+		if ( isset( $wp_filter['template_redirect'] ) ) {
+			foreach ( $wp_filter['template_redirect']->callbacks as $priority => $callbacks ) {
+				foreach ( $callbacks as $key => $callback ) {
+					if ( ! isset( $callback['function'] ) || ! is_array( $callback['function'] ) ) {
+						continue;
+					}
+					$method = $callback['function'][1] ?? '';
+					$object = $callback['function'][0] ?? null;
+					if ( is_object( $object ) && in_array( $method, $redirect_methods, true ) ) {
+						remove_action( 'template_redirect', $callback['function'], $priority );
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Render the unified members area view when visiting /members-area/
 	 * without a specific membership ID.
 	 *
@@ -108,17 +151,10 @@ class WCMembershipCompatibility {
 	 */
 	public function maybe_render_unified_view( $value ) {
 		// Only intercept the top-level members-area (no specific membership selected).
-		// When $value is a membership ID or path like "123/content", WCM handles it.
-		if ( ! empty( $value ) && is_numeric( $value ) ) {
-			return;
-		}
-		// If the value contains a slash, it's a sub-path like "123/content".
-		if ( ! empty( $value ) && false !== strpos( $value, '/' ) ) {
-			return;
-		}
-		// Empty value or non-numeric = top-level listing page.
-		if ( ! empty( $value ) && ! is_numeric( $value ) ) {
-			// Could be a section slug for a specific membership — let WCM handle it.
+		// When $value contains a membership ID (numeric) or a sub-path like
+		// "123/content", let WCM handle it normally.
+		$value = trim( (string) $value );
+		if ( '' !== $value ) {
 			return;
 		}
 
