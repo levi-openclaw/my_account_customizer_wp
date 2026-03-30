@@ -294,10 +294,12 @@ class WCMembershipCompatibility {
 	}
 
 	/**
-	 * Render combined discounts across all memberships.
+	 * Render combined discounts across all memberships as product cards.
 	 *
-	 * When a product has discounts from multiple memberships, only the
-	 * highest (best) discount is shown.
+	 * Collects all discount rules, resolves them to actual WooCommerce
+	 * products (expanding category rules to their products), deduplicates
+	 * by product ID keeping only the best discount, and renders a card
+	 * grid with image, name, original price, member price, and badge.
 	 *
 	 * @since 2.1.0
 	 *
@@ -305,26 +307,8 @@ class WCMembershipCompatibility {
 	 * @return void
 	 */
 	private function render_combined_discounts( $memberships ) {
-		if ( ! function_exists( 'wc_memberships_get_member_product_discount' ) ) {
-			// Fall back to collecting discount rules from plans.
-			$this->render_combined_discounts_from_rules( $memberships );
-			return;
-		}
-
-		$this->render_combined_discounts_from_rules( $memberships );
-	}
-
-	/**
-	 * Render combined discounts by collecting discount rules from all
-	 * membership plans and showing the best discount per product.
-	 *
-	 * @since 2.1.0
-	 *
-	 * @param \WC_Memberships_User_Membership[] $memberships User memberships.
-	 * @return void
-	 */
-	private function render_combined_discounts_from_rules( $memberships ) {
-		$discount_rows = array();
+		// Step 1: Collect best discount per product ID across all memberships.
+		$product_discounts = array(); // product_id => { amount, is_pct, plan_name }
 
 		foreach ( $memberships as $membership ) {
 			$plan = $membership->get_plan();
@@ -343,101 +327,135 @@ class WCMembershipCompatibility {
 				$object_ids = $rule->get_object_ids();
 				$amount     = (float) $rule->get_discount_amount();
 				$type       = $rule->get_discount_type();
+				$is_pct     = ( false !== strpos( $type, 'percentage' ) );
 
-				// Normalize to a comparable value.
-				$is_percentage = ( false !== strpos( $type, 'percentage' ) );
+				// Resolve object IDs to actual product IDs.
+				$product_ids = array();
 
-				// Determine target type from the rule's content type or discount type.
-				$rule_content_type = method_exists( $rule, 'get_content_type_name' ) ? $rule->get_content_type_name() : '';
-				$is_category = ( false !== strpos( $type, 'category' ) )
-					|| ( false !== strpos( $rule_content_type, 'categor' ) )
-					|| ( method_exists( $rule, 'get_content_type' ) && 'product_cat' === $rule->get_content_type() );
+				if ( empty( $object_ids ) ) {
+					// Rule applies to ALL products — query published products.
+					$all_products = wc_get_products( array(
+						'status' => 'publish',
+						'limit'  => 100,
+						'return' => 'ids',
+					) );
+					$product_ids = $all_products;
+				} else {
+					foreach ( $object_ids as $oid ) {
+						// Check if this is a product.
+						$product = wc_get_product( $oid );
+						if ( $product && 'publish' === $product->get_status() ) {
+							$product_ids[] = $oid;
+							continue;
+						}
 
-				if ( ! empty( $object_ids ) ) {
-					// Discount applies to specific products/categories.
-					foreach ( $object_ids as $object_id ) {
-						$key = $object_id . '_' . ( $is_percentage ? 'pct' : 'amt' );
-						$target_type = $is_category ? 'category' : 'product';
+						// Check if it's a product category term.
+						$term = get_term( $oid, 'product_cat' );
+						if ( $term && ! is_wp_error( $term ) ) {
+							$cat_products = wc_get_products( array(
+								'status'   => 'publish',
+								'category' => array( $term->slug ),
+								'limit'    => 100,
+								'return'   => 'ids',
+							) );
+							$product_ids = array_merge( $product_ids, $cat_products );
+						}
+					}
+				}
 
-						if ( ! isset( $discount_rows[ $key ] ) || $amount > $discount_rows[ $key ]['amount'] ) {
-							$discount_rows[ $key ] = array(
-								'object_id'   => $object_id,
-								'target_type' => $target_type,
-								'amount'      => $amount,
-								'is_pct'      => $is_percentage,
-								'plan_name'   => $plan_name,
+				// Register best discount per product.
+				foreach ( $product_ids as $pid ) {
+					$pid = (int) $pid;
+					if ( ! isset( $product_discounts[ $pid ] ) ) {
+						$product_discounts[ $pid ] = array(
+							'amount'    => $amount,
+							'is_pct'    => $is_pct,
+							'plan_name' => $plan_name,
+						);
+					} else {
+						// Keep the better discount (higher percentage wins; if mixed types, percentage 100 > fixed).
+						$existing = $product_discounts[ $pid ];
+						if ( $is_pct && $amount > $existing['amount'] ) {
+							$product_discounts[ $pid ] = array(
+								'amount'    => $amount,
+								'is_pct'    => $is_pct,
+								'plan_name' => $plan_name,
+							);
+						} elseif ( ! $existing['is_pct'] && ! $is_pct && $amount > $existing['amount'] ) {
+							$product_discounts[ $pid ] = array(
+								'amount'    => $amount,
+								'is_pct'    => false,
+								'plan_name' => $plan_name,
 							);
 						}
 					}
-				} else {
-					// Discount applies to all products.
-					$key = 'all_' . ( $is_percentage ? 'pct' : 'amt' );
-					if ( ! isset( $discount_rows[ $key ] ) || $amount > $discount_rows[ $key ]['amount'] ) {
-						$discount_rows[ $key ] = array(
-							'object_id'   => 0,
-							'target_type' => 'all',
-							'amount'      => $amount,
-							'is_pct'      => $is_percentage,
-							'plan_name'   => $plan_name,
-						);
-					}
 				}
 			}
 		}
 
-		if ( empty( $discount_rows ) ) {
+		if ( empty( $product_discounts ) ) {
+			echo '<p>' . esc_html__( 'No discounts available at this time.', 'customize-my-account-page-for-woocommerce' ) . '</p>';
 			return;
 		}
 
-		echo '<div class="tgwc-memberships-discounts">';
-		echo '<h3>' . esc_html__( 'Your Discounts', 'customize-my-account-page-for-woocommerce' ) . '</h3>';
-		echo '<table class="shop_table tgwc-discounts-table"><thead><tr>';
-		echo '<th>' . esc_html__( 'Applies To', 'customize-my-account-page-for-woocommerce' ) . '</th>';
-		echo '<th>' . esc_html__( 'Discount', 'customize-my-account-page-for-woocommerce' ) . '</th>';
-		echo '<th>' . esc_html__( 'Via Membership', 'customize-my-account-page-for-woocommerce' ) . '</th>';
-		echo '</tr></thead><tbody>';
+		// Step 2: Render as product card grid.
+		echo '<div class="tgwc-discount-grid">';
 
-		foreach ( $discount_rows as $row ) {
-			$applies_to = '';
-			if ( 'all' === $row['target_type'] ) {
-				$applies_to = __( 'All Products', 'customize-my-account-page-for-woocommerce' );
-			} elseif ( 'category' === $row['target_type'] ) {
-				$term = get_term( $row['object_id'], 'product_cat' );
-				$applies_to = $term && ! is_wp_error( $term ) ? $term->name : sprintf( __( 'Category #%d', 'customize-my-account-page-for-woocommerce' ), $row['object_id'] );
-			} else {
-				// Try loading as a product first, then fall back to post title.
-				$product = wc_get_product( $row['object_id'] );
-				if ( $product ) {
-					$applies_to = $product->get_name();
+		foreach ( $product_discounts as $product_id => $disc ) {
+			$product = wc_get_product( $product_id );
+			if ( ! $product ) {
+				continue;
+			}
+
+			$name          = $product->get_name();
+			$permalink     = $product->get_permalink();
+			$regular_price = (float) $product->get_regular_price();
+			$image         = $product->get_image( 'woocommerce_thumbnail', array( 'class' => 'tgwc-discount-card-img' ) );
+
+			// Calculate member price.
+			if ( $disc['is_pct'] ) {
+				if ( $disc['amount'] >= 100 ) {
+					$badge_text   = __( 'FREE', 'customize-my-account-page-for-woocommerce' );
+					$member_price = 0;
 				} else {
-					// May be a post/page ID or a category term ID used by the rule.
-					$post = get_post( $row['object_id'] );
-					if ( $post ) {
-						$applies_to = $post->post_title;
-					} else {
-						$term = get_term( $row['object_id'] );
-						$applies_to = ( $term && ! is_wp_error( $term ) ) ? $term->name : sprintf( __( 'Item #%d', 'customize-my-account-page-for-woocommerce' ), $row['object_id'] );
-					}
+					$badge_text   = round( $disc['amount'] ) . '% ' . __( 'off', 'customize-my-account-page-for-woocommerce' );
+					$member_price = $regular_price * ( 1 - $disc['amount'] / 100 );
 				}
+			} else {
+				$badge_text   = wc_price( $disc['amount'] ) . ' ' . __( 'off', 'customize-my-account-page-for-woocommerce' );
+				$member_price = max( 0, $regular_price - $disc['amount'] );
 			}
 
-			$discount_display = $row['is_pct']
-				? round( $row['amount'] ) . '%'
-				: wc_price( $row['amount'] );
+			echo '<div class="tgwc-discount-card">';
+			echo '<a href="' . esc_url( $permalink ) . '" class="tgwc-discount-card-link">';
 
-			// Highlight 100% discounts.
-			if ( $row['is_pct'] && $row['amount'] >= 100 ) {
-				$discount_display = '<strong>' . esc_html__( 'FREE', 'customize-my-account-page-for-woocommerce' ) . '</strong>';
+			// Badge
+			echo '<span class="tgwc-discount-badge">' . esc_html( $badge_text ) . '</span>';
+
+			// Image
+			echo '<div class="tgwc-discount-card-image">' . $image . '</div>';
+
+			// Info
+			echo '<div class="tgwc-discount-card-info">';
+			echo '<h4 class="tgwc-discount-card-title">' . esc_html( $name ) . '</h4>';
+
+			// Prices
+			echo '<div class="tgwc-discount-card-prices">';
+			if ( $regular_price > 0 ) {
+				echo '<span class="tgwc-price-original"><del>' . wc_price( $regular_price ) . '</del></span> ';
 			}
+			echo '<span class="tgwc-price-member">' . wc_price( $member_price ) . '</span>';
+			echo '</div>';
 
-			echo '<tr>';
-			echo '<td>' . esc_html( $applies_to ) . '</td>';
-			echo '<td>' . wp_kses_post( $discount_display ) . '</td>';
-			echo '<td>' . esc_html( $row['plan_name'] ) . '</td>';
-			echo '</tr>';
+			// Membership source
+			echo '<span class="tgwc-discount-card-via">' . esc_html( $disc['plan_name'] ) . '</span>';
+
+			echo '</div>'; // card-info
+			echo '</a>';
+			echo '</div>'; // card
 		}
 
-		echo '</tbody></table></div>';
+		echo '</div>'; // grid
 	}
 
 	/**
@@ -721,6 +739,101 @@ class WCMembershipCompatibility {
 				opacity: 1;
 				border-bottom-color: currentColor;
 				font-weight: 600;
+			}
+
+			/* Discount product card grid */
+			.tgwc-discount-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 20px;
+				margin-top: 0.5em;
+			}
+
+			.tgwc-discount-card {
+				position: relative;
+				border: 1px solid #e5e5e5;
+				border-radius: 8px;
+				overflow: hidden;
+				transition: box-shadow 0.2s ease, transform 0.15s ease;
+				background: #fff;
+			}
+
+			.tgwc-discount-card:hover {
+				box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+				transform: translateY(-2px);
+			}
+
+			.tgwc-discount-card-link {
+				display: block;
+				text-decoration: none;
+				color: inherit;
+			}
+
+			.tgwc-discount-badge {
+				position: absolute;
+				top: 10px;
+				left: 10px;
+				background: #2d2d2d;
+				color: #fff;
+				font-size: 0.75em;
+				font-weight: 700;
+				padding: 3px 10px;
+				border-radius: 4px;
+				z-index: 1;
+				text-transform: uppercase;
+				letter-spacing: 0.02em;
+			}
+
+			.tgwc-discount-card-image {
+				aspect-ratio: 1 / 1;
+				overflow: hidden;
+				background: #f5f5f5;
+			}
+
+			.tgwc-discount-card-image img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			.tgwc-discount-card-info {
+				padding: 12px 14px 16px;
+			}
+
+			.tgwc-discount-card-title {
+				margin: 0 0 6px;
+				font-size: 0.95em;
+				font-weight: 600;
+				line-height: 1.3;
+			}
+
+			.tgwc-discount-card-prices {
+				margin-bottom: 4px;
+				font-size: 0.9em;
+			}
+
+			.tgwc-price-original {
+				opacity: 0.5;
+				margin-right: 4px;
+			}
+
+			.tgwc-price-member {
+				font-weight: 700;
+			}
+
+			.tgwc-discount-card-via {
+				display: block;
+				font-size: 0.78em;
+				opacity: 0.5;
+				margin-top: 2px;
+			}
+
+			@media screen and (max-width: 480px) {
+				.tgwc-discount-grid {
+					grid-template-columns: repeat(2, 1fr);
+					gap: 12px;
+				}
 			}
 
 			/* Unified members area sections */
