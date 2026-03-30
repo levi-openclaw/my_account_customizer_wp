@@ -93,28 +93,29 @@ class WCMembershipCompatibility {
 		}
 
 		$product = wc_get_product( $product_id );
-		if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		if ( ! $product ) {
+			wp_send_json_error( array( 'message' => __( 'Product not found.', 'customize-my-account-page-for-woocommerce' ) ) );
+		}
+
+		// For variable/grouped products, link to the product page instead.
+		if ( ! $product->is_type( 'simple' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Please visit the product page to select options.', 'customize-my-account-page-for-woocommerce' ) ) );
+		}
+
+		if ( ! $product->is_purchasable() || ! $product->is_in_stock() ) {
 			wp_send_json_error( array( 'message' => __( 'This product cannot be added to your cart.', 'customize-my-account-page-for-woocommerce' ) ) );
 		}
 
-		$added = WC()->cart->add_to_cart( $product_id );
+		$added = WC()->cart->add_to_cart( $product_id, 1 );
 
 		if ( $added ) {
-			// Get updated cart fragments for the theme's cart widget/drawer.
-			ob_start();
-			wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
-			\WC_AJAX::get_refreshed_fragments();
-			$fragments_json = ob_get_clean();
-			$fragments_data = json_decode( $fragments_json, true );
-
 			wp_send_json_success( array(
-				'message'   => sprintf(
+				'message'    => sprintf(
 					/* translators: %s: product name */
 					__( '"%s" added to your cart', 'customize-my-account-page-for-woocommerce' ),
 					$product->get_name()
 				),
-				'fragments' => isset( $fragments_data['fragments'] ) ? $fragments_data['fragments'] : array(),
-				'cart_hash' => isset( $fragments_data['cart_hash'] ) ? $fragments_data['cart_hash'] : '',
+				'cart_count' => WC()->cart->get_cart_contents_count(),
 			) );
 		} else {
 			wp_send_json_error( array( 'message' => __( 'Could not add to cart. It may already be in your cart.', 'customize-my-account-page-for-woocommerce' ) ) );
@@ -270,7 +271,7 @@ class WCMembershipCompatibility {
 
 		// --- Tab switching JS ---
 		?>
-		<script id="tgwc-membership-tabs-v2.1.7">
+		<script id="tgwc-membership-tabs-v2.1.8">
 		(function() {
 			var tabs = document.querySelectorAll('.tgwc-membership-tabs .tgwc-membership-tab a');
 			var panels = document.querySelectorAll('.tgwc-membership-tab-panel');
@@ -453,8 +454,8 @@ class WCMembershipCompatibility {
 
 		// Step 2: Render using proven card pattern — scoped styles + clean HTML.
 		?>
-		<style id="tgwc-discount-cards-v2.1.7">
-			/* tgwc-discount-cards v2.1.7 */
+		<style id="tgwc-discount-cards-v2.1.8">
+			/* tgwc-discount-cards v2.1.8 */
 			.tgwc-dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; align-content: start; }
 			.tgwc-dc { display: flex; align-items: center; gap: 14px; padding: 8px 14px 8px 8px; border: 2px solid rgba(23,25,21,0.1); border-radius: 8px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; box-sizing: border-box; transition: border-color .2s, background .2s; }
 			.tgwc-dc:hover { border-color: rgba(162,150,74,0.25); background: rgba(162,150,74,0.08); }
@@ -469,9 +470,9 @@ class WCMembershipCompatibility {
 			.tgwc-dc-prices del { color: rgba(23,25,21,0.4); font-weight: 400; font-size: 12px; }
 			.tgwc-dc-prices strong { font-weight: 700; color: #171915; }
 			.tgwc-dc-via { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(23,25,21,0.45); }
-			.tgwc-dc-cart { display: inline-block; margin-top: 4px; padding: 4px 14px; border-radius: 4px; background: #a2964a; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.04em; transition: background .15s; }
-			.tgwc-dc-cart:hover { background: #8a7f3e; }
-			@media (max-width: 768px) { .tgwc-dg { grid-template-columns: 1fr; } }
+			.tgwc-dc-cart { display: inline-block; margin-top: 4px; padding: 4px 14px; border: none !important; border-radius: 4px; background: #a2964a !important; color: #fff !important; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.04em; transition: background .15s; box-shadow: none !important; cursor: pointer; line-height: 1.6; }
+			.tgwc-dc-cart:hover { background: #8a7f3e !important; }
+			@media (max-width: 1024px) { .tgwc-dg { grid-template-columns: 1fr !important; } }
 		</style>
 		<?php
 		echo '<div class="tgwc-dg">';
@@ -530,12 +531,12 @@ class WCMembershipCompatibility {
 
 		// AJAX add-to-cart + toast notification.
 		?>
-		<style id="tgwc-cart-toast-v2.1.7">
+		<style id="tgwc-cart-toast-v2.1.8">
 			.tgwc-toast { position: fixed; bottom: 24px; right: 24px; background: #171915; color: #fff; font-family: 'DM Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 8px; z-index: 99999; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; }
 			.tgwc-toast.tgwc-toast--visible { opacity: 1; transform: translateY(0); }
 			.tgwc-dc-cart[disabled] { opacity: 0.5; pointer-events: none; }
 		</style>
-		<script id="tgwc-ajax-cart-v2.1.7">
+		<script id="tgwc-ajax-cart-v2.1.8">
 		function tgwcAddToCart(btn, productId) {
 			var origText = btn.textContent;
 			btn.disabled = true;
@@ -558,7 +559,7 @@ class WCMembershipCompatibility {
 					// Trigger WC cart fragments refresh (updates cart icon/drawer).
 					if (window.jQuery) {
 						jQuery(document.body).trigger('wc_fragment_refresh');
-						jQuery(document.body).trigger('added_to_cart', [res.data && res.data.fragments || {}, res.data && res.data.cart_hash || '', jQuery(btn)]);
+						jQuery(document.body).trigger('added_to_cart', [{}, '', jQuery(btn)]);
 					}
 				} else {
 					btn.textContent = '<?php echo esc_js( __( 'Error', 'customize-my-account-page-for-woocommerce' ) ); ?>';
@@ -807,8 +808,8 @@ class WCMembershipCompatibility {
 			return;
 		}
 		?>
-		<style id="tgwc-memberships-compat-v2.1.7">
-			/* tgwc-memberships-compat v2.1.7 */
+		<style id="tgwc-memberships-compat-v2.1.8">
+			/* tgwc-memberships-compat v2.1.8 */
 			/* ================================================================
 			   Gamut Design Tokens
 			   ================================================================ */
