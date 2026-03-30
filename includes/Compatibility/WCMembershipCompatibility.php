@@ -271,7 +271,7 @@ class WCMembershipCompatibility {
 
 		// --- Tab switching JS ---
 		?>
-		<script id="tgwc-membership-tabs-v2.1.9">
+		<script id="tgwc-membership-tabs-v2.2.0">
 		(function() {
 			var tabs = document.querySelectorAll('.tgwc-membership-tabs .tgwc-membership-tab a');
 			var panels = document.querySelectorAll('.tgwc-membership-tab-panel');
@@ -454,8 +454,8 @@ class WCMembershipCompatibility {
 
 		// Step 2: Render using proven card pattern — scoped styles + clean HTML.
 		?>
-		<style id="tgwc-discount-cards-v2.1.9">
-			/* tgwc-discount-cards v2.1.9 */
+		<style id="tgwc-discount-cards-v2.2.0">
+			/* tgwc-discount-cards v2.2.0 */
 			.tgwc-dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; align-content: start; }
 			.tgwc-dc { display: flex; align-items: center; gap: 14px; padding: 8px 14px 8px 8px; border: 2px solid rgba(23,25,21,0.1); border-radius: 8px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; box-sizing: border-box; transition: border-color .2s, background .2s; }
 			.tgwc-dc:hover { border-color: rgba(162,150,74,0.25); background: rgba(162,150,74,0.08); }
@@ -472,6 +472,8 @@ class WCMembershipCompatibility {
 			.tgwc-dc-via { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(23,25,21,0.45); }
 			.tgwc-dc-cart { display: inline-block; margin-top: 4px; padding: 4px 14px; border: none !important; border-radius: 4px; background: #a2964a !important; color: #fff !important; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.04em; transition: background .15s; box-shadow: none !important; cursor: pointer; line-height: 1.6; }
 			.tgwc-dc-cart:hover { background: #8a7f3e !important; }
+			.tgwc-dc-cart--incart { background: rgba(23,25,21,0.15) !important; color: rgba(23,25,21,0.5) !important; }
+			.tgwc-dc-cart--incart:hover { background: rgba(23,25,21,0.22) !important; color: rgba(23,25,21,0.7) !important; }
 			@media (max-width: 1024px) { .tgwc-dg { grid-template-columns: 1fr !important; } }
 		</style>
 		<?php
@@ -520,7 +522,13 @@ class WCMembershipCompatibility {
 						echo '</span>';
 						echo '<span class="tgwc-dc-via">' . esc_html( $disc['plan_name'] ) . '</span>';
 						if ( $product->is_purchasable() && $product->is_in_stock() ) {
-							echo '<button type="button" class="tgwc-dc-cart" data-product-id="' . esc_attr( $product_id ) . '" onclick="event.stopPropagation();tgwcAddToCart(this,' . esc_attr( $product_id ) . ')">' . esc_html__( 'Add to Cart', 'customize-my-account-page-for-woocommerce' ) . '</button>';
+							$in_cart = $this->is_product_in_cart( $product_id );
+							if ( $in_cart ) {
+								$cart_url = wc_get_cart_url();
+								echo '<a href="' . esc_url( $cart_url ) . '" class="tgwc-dc-cart tgwc-dc-cart--incart" onclick="event.stopPropagation();">' . esc_html__( 'View Cart', 'customize-my-account-page-for-woocommerce' ) . '</a>';
+							} else {
+								echo '<button type="button" class="tgwc-dc-cart" data-product-id="' . esc_attr( $product_id ) . '" onclick="event.stopPropagation();tgwcAddToCart(this,' . esc_attr( $product_id ) . ')">' . esc_html__( 'Add to Cart', 'customize-my-account-page-for-woocommerce' ) . '</button>';
+							}
 						}
 					echo '</span>';
 				echo '</div>';
@@ -531,12 +539,12 @@ class WCMembershipCompatibility {
 
 		// AJAX add-to-cart + toast notification.
 		?>
-		<style id="tgwc-cart-toast-v2.1.9">
+		<style id="tgwc-cart-toast-v2.2.0">
 			.tgwc-toast { position: fixed; bottom: 24px; right: 24px; background: #171915; color: #fff; font-family: 'DM Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 8px; z-index: 99999; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; }
 			.tgwc-toast.tgwc-toast--visible { opacity: 1; transform: translateY(0); }
 			.tgwc-dc-cart[disabled] { opacity: 0.5; pointer-events: none; }
 		</style>
-		<script id="tgwc-ajax-cart-v2.1.9">
+		<script id="tgwc-ajax-cart-v2.2.0">
 		function tgwcAddToCart(btn, productId) {
 			var origText = btn.textContent;
 			btn.disabled = true;
@@ -561,11 +569,19 @@ class WCMembershipCompatibility {
 						jQuery(document.body).trigger('wc_fragment_refresh');
 						jQuery(document.body).trigger('added_to_cart', [{}, '', jQuery(btn)]);
 					}
+					// Swap button to "View Cart" link.
+					var cartUrl = '<?php echo esc_js( wc_get_cart_url() ); ?>';
+					var link = document.createElement('a');
+					link.href = cartUrl;
+					link.className = 'tgwc-dc-cart tgwc-dc-cart--incart';
+					link.textContent = '<?php echo esc_js( __( 'View Cart', 'customize-my-account-page-for-woocommerce' ) ); ?>';
+					link.onclick = function(e) { e.stopPropagation(); };
+					btn.replaceWith(link);
 				} else {
 					btn.textContent = '<?php echo esc_js( __( 'Error', 'customize-my-account-page-for-woocommerce' ) ); ?>';
 					tgwcShowToast(res.data && res.data.message ? res.data.message : '<?php echo esc_js( __( 'Could not add to cart', 'customize-my-account-page-for-woocommerce' ) ); ?>');
+					setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 2000);
 				}
-				setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 2000);
 			})
 			.catch(function() {
 				btn.textContent = origText;
@@ -602,6 +618,24 @@ class WCMembershipCompatibility {
 	 * @param \WC_Memberships_User_Membership[] $memberships User memberships.
 	 * @return bool
 	 */
+	/**
+	 * Check if a product is already in the WooCommerce cart.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return bool
+	 */
+	private function is_product_in_cart( $product_id ) {
+		if ( ! WC()->cart ) {
+			return false;
+		}
+		foreach ( WC()->cart->get_cart() as $item ) {
+			if ( (int) $item['product_id'] === (int) $product_id ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private function memberships_have_content( $memberships ) {
 		foreach ( $memberships as $membership ) {
 			$plan = $membership->get_plan();
@@ -808,8 +842,8 @@ class WCMembershipCompatibility {
 			return;
 		}
 		?>
-		<style id="tgwc-memberships-compat-v2.1.9">
-			/* tgwc-memberships-compat v2.1.9 */
+		<style id="tgwc-memberships-compat-v2.2.0">
+			/* tgwc-memberships-compat v2.2.0 */
 			/* ================================================================
 			   Gamut Design Tokens
 			   ================================================================ */
