@@ -159,23 +159,44 @@ class EligibilityAccess {
 			return $endpoints;
 		}
 
+		// Only run expensive eligibility checks on the account page.
+		if ( function_exists( 'is_account_page' ) && ! is_account_page() ) {
+			return $endpoints;
+		}
+
+		// Cache the result for repeated calls within the same request.
+		static $cached_hide = null;
+		if ( null !== $cached_hide ) {
+			return $this->apply_hide_list( $endpoints, $cached_hide );
+		}
+
 		$eligibility_settings = $this->get_eligibility_settings();
 		$endpoints_to_hide    = $this->get_ineligible_endpoints( $eligibility_settings );
 
 		// Also apply custom subscription-based endpoint rules.
 		$custom_hide       = $this->get_custom_rule_ineligible_endpoints();
 		$endpoints_to_hide = array_unique( array_merge( $endpoints_to_hide, $custom_hide ) );
+		$cached_hide       = $endpoints_to_hide;
 
+		return $this->apply_hide_list( $endpoints, $endpoints_to_hide );
+	}
+
+	/**
+	 * Remove endpoint slugs from the endpoint tree.
+	 *
+	 * @param array $endpoints       Endpoint tree.
+	 * @param array $endpoints_to_hide Slugs to remove.
+	 * @return array
+	 */
+	private function apply_hide_list( $endpoints, $endpoints_to_hide ) {
 		if ( empty( $endpoints_to_hide ) ) {
 			return $endpoints;
 		}
 
-		// Remove from top-level endpoints.
 		foreach ( $endpoints_to_hide as $slug ) {
 			unset( $endpoints[ $slug ] );
 		}
 
-		// Remove from group children.
 		foreach ( $endpoints as $key => $endpoint ) {
 			if ( isset( $endpoint['children'] ) ) {
 				foreach ( $endpoints_to_hide as $slug ) {
@@ -340,17 +361,9 @@ class EligibilityAccess {
 	 * @return bool
 	 */
 	public function user_has_subscriptions() {
-		if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
-			return false;
-		}
-		$subscriptions = wcs_get_subscriptions(
-			array(
-				'customer_id'       => get_current_user_id(),
-				'subscription_status' => array( 'active', 'on-hold', 'pending', 'pending-cancel', 'cancelled', 'expired' ),
-				'subscriptions_per_page' => 1,
-			)
-		);
-		return ! empty( $subscriptions );
+		// Reuse the cached product map — if it has any entries, user has subscriptions.
+		$map = $this->get_user_subscription_product_map();
+		return ! empty( $map );
 	}
 
 	/**

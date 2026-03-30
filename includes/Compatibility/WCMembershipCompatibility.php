@@ -409,29 +409,24 @@ class WCMembershipCompatibility {
 				$product_ids = array();
 
 				if ( empty( $object_ids ) ) {
-					// Rule applies to ALL products — query published products.
-					$all_products = wc_get_products( array(
-						'status' => 'publish',
-						'limit'  => 100,
-						'return' => 'ids',
-					) );
-					$product_ids = $all_products;
+					// Global rule — store as special ID 0 (rendered separately).
+					$product_ids = array( 0 );
 				} else {
 					foreach ( $object_ids as $oid ) {
-						// Check if this is a product.
-						$product = wc_get_product( $oid );
-						if ( $product && 'publish' === $product->get_status() ) {
+						$oid = (int) $oid;
+						// Cheap check: is it a product post type?
+						$post_type = get_post_type( $oid );
+						if ( $post_type && in_array( $post_type, array( 'product', 'product_variation' ), true ) ) {
 							$product_ids[] = $oid;
 							continue;
 						}
-
-						// Check if it's a product category term.
+						// Check if it's a product category term — expand to products.
 						$term = get_term( $oid, 'product_cat' );
 						if ( $term && ! is_wp_error( $term ) ) {
 							$cat_products = wc_get_products( array(
 								'status'   => 'publish',
 								'category' => array( $term->slug ),
-								'limit'    => 100,
+								'limit'    => 50,
 								'return'   => 'ids',
 							) );
 							$product_ids = array_merge( $product_ids, $cat_products );
@@ -499,6 +494,20 @@ class WCMembershipCompatibility {
 			@media (max-width: 1024px) { .tgwc-dg { grid-template-columns: 1fr !important; } }
 		</style>
 		<?php
+		// Render global discount banners first (product_id 0).
+		if ( isset( $product_discounts[0] ) ) {
+			$gdisc     = $product_discounts[0];
+			$gtext     = $gdisc['is_pct'] ? round( $gdisc['amount'] ) . '% ' . __( 'off all products', 'customize-my-account-page-for-woocommerce' ) : wc_price( $gdisc['amount'] ) . ' ' . __( 'off all products', 'customize-my-account-page-for-woocommerce' );
+			$gbg       = ( $gdisc['is_pct'] && $gdisc['amount'] >= 100 ) ? '#7C9678' : '#A84F0A';
+			if ( $gdisc['is_pct'] && $gdisc['amount'] >= 100 ) {
+				$gtext = __( 'All products FREE', 'customize-my-account-page-for-woocommerce' );
+			}
+			echo '<div style="padding:12px 18px;border-radius:8px;background:' . esc_attr( $gbg ) . ';color:#fff;font-family:DM Sans,sans-serif;font-size:14px;font-weight:600;margin-bottom:12px;">';
+			echo esc_html( $gtext ) . ' <span style="font-weight:400;opacity:0.7;">— ' . esc_html( $gdisc['plan_name'] ) . '</span>';
+			echo '</div>';
+			unset( $product_discounts[0] );
+		}
+
 		echo '<div class="tgwc-dg">';
 
 		foreach ( $product_discounts as $product_id => $disc ) {
@@ -659,6 +668,26 @@ class WCMembershipCompatibility {
 	}
 
 	private function memberships_have_content( $memberships ) {
+		$items = $this->get_combined_content_items( $memberships );
+		return ! empty( $items );
+	}
+
+	/**
+	 * Build and cache the combined content items across all memberships.
+	 * Called by both memberships_have_content() and render_combined_content().
+	 *
+	 * @param \WC_Memberships_User_Membership[] $memberships
+	 * @return array
+	 */
+	private function get_combined_content_items( $memberships ) {
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
+		}
+
+		$cache    = array();
+		$seen_ids = array();
+
 		foreach ( $memberships as $membership ) {
 			$plan = $membership->get_plan();
 			if ( ! $plan || ! $membership->is_active() ) {
@@ -671,16 +700,34 @@ class WCMembershipCompatibility {
 			}
 
 			foreach ( $rules as $rule ) {
-				$object_ids = $rule->get_object_ids();
-				foreach ( $object_ids as $object_id ) {
-					$post = get_post( $object_id );
-					if ( $post && 'publish' === $post->post_status ) {
-						return true;
+				foreach ( $rule->get_object_ids() as $object_id ) {
+					if ( isset( $seen_ids[ $object_id ] ) ) {
+						continue;
 					}
+					$seen_ids[ $object_id ] = true;
+
+					$post = get_post( $object_id );
+					if ( ! $post || 'publish' !== $post->post_status ) {
+						continue;
+					}
+
+					if ( function_exists( 'wc_memberships_is_post_content_restricted' ) && ! current_user_can( 'wc_memberships_view_restricted_post_content', $object_id ) ) {
+						continue;
+					}
+
+					$cache[] = array(
+						'id'        => $object_id,
+						'title'     => $post->post_title,
+						'type'      => $post->post_type,
+						'url'       => get_permalink( $object_id ),
+						'excerpt'   => wp_trim_words( $post->post_excerpt ? $post->post_excerpt : $post->post_content, 25 ),
+						'plan_name' => $plan->get_name(),
+					);
 				}
 			}
 		}
-		return false;
+
+		return $cache;
 	}
 
 	/**
@@ -695,51 +742,7 @@ class WCMembershipCompatibility {
 	 * @return void
 	 */
 	private function render_combined_content( $memberships ) {
-		$content_items = array();
-		$seen_ids      = array();
-
-		foreach ( $memberships as $membership ) {
-			$plan = $membership->get_plan();
-			if ( ! $plan || ! $membership->is_active() ) {
-				continue;
-			}
-
-			$rules = $plan->get_content_restriction_rules();
-			if ( empty( $rules ) ) {
-				continue;
-			}
-
-			foreach ( $rules as $rule ) {
-				$object_ids  = $rule->get_object_ids();
-				$content_type = $rule->get_content_type();
-
-				foreach ( $object_ids as $object_id ) {
-					if ( isset( $seen_ids[ $object_id ] ) ) {
-						continue;
-					}
-					$seen_ids[ $object_id ] = true;
-
-					$post = get_post( $object_id );
-					if ( ! $post || 'publish' !== $post->post_status ) {
-						continue;
-					}
-
-					// Check the user can actually access this content.
-					if ( function_exists( 'wc_memberships_is_post_content_restricted' ) && ! current_user_can( 'wc_memberships_view_restricted_post_content', $object_id ) ) {
-						continue;
-					}
-
-					$content_items[] = array(
-						'id'        => $object_id,
-						'title'     => $post->post_title,
-						'type'      => $post->post_type,
-						'url'       => get_permalink( $object_id ),
-						'excerpt'   => wp_trim_words( $post->post_excerpt ? $post->post_excerpt : $post->post_content, 25 ),
-						'plan_name' => $plan->get_name(),
-					);
-				}
-			}
-		}
+		$content_items = $this->get_combined_content_items( $memberships );
 
 		if ( empty( $content_items ) ) {
 			return;

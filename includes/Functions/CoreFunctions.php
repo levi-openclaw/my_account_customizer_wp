@@ -1354,13 +1354,7 @@ if ( ! function_exists( 'tgwc_get_account_menu_items' ) ) {
 			}
 		);
 
-		if (
-			function_exists( 'wc_memberships_get_user_memberships' ) &&
-			empty( wc_memberships_get_user_memberships() ) &&
-			array_key_exists( 'members-area', $endpoints )
-		) {
-			unset( $endpoints['members-area'] );
-		}
+		// Note: membership visibility is handled by EligibilityAccess::filter_endpoints().
 
 		return array_map(
 			function ( $endpoint ) {

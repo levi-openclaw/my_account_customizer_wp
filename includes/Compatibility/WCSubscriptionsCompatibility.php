@@ -173,6 +173,13 @@ class WCSubscriptionsCompatibility {
 			return;
 		}
 
+		// Only run on the subscriptions endpoint, not every account page.
+		global $wp;
+		$sub_endpoint = get_option( 'woocommerce_myaccount_subscriptions_endpoint', 'subscriptions' );
+		if ( ! isset( $wp->query_vars[ $sub_endpoint ] ) ) {
+			return;
+		}
+
 		if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
 			return;
 		}
