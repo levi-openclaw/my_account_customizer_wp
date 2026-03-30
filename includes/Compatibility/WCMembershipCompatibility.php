@@ -819,22 +819,25 @@ class WCMembershipCompatibility {
 			   Discount Product List (horizontal rows)
 			   ================================================================ */
 			.tgwc-discount-list {
-				display: grid;
+				display: grid !important;
 				grid-template-columns: repeat(2, 1fr);
 				gap: 10px;
 			}
 
 			.tgwc-discount-row {
-				display: flex;
-				align-items: center;
+				display: flex !important;
+				flex-direction: row !important;
+				align-items: center !important;
 				gap: 14px;
 				padding: 10px 14px;
 				border: 2px solid var(--grass-10, rgba(23,25,21,0.1));
 				border-radius: 8px;
 				background: #fff;
-				text-decoration: none;
-				color: inherit;
+				text-decoration: none !important;
+				color: inherit !important;
 				transition: border-color 0.2s ease, background 0.2s ease;
+				min-height: 72px;
+				box-sizing: border-box;
 			}
 
 			.tgwc-discount-row:hover {
@@ -844,39 +847,43 @@ class WCMembershipCompatibility {
 
 			/* Thumbnail */
 			.tgwc-discount-row-thumb {
-				flex: 0 0 52px;
-				width: 52px;
-				height: 52px;
+				flex: 0 0 52px !important;
+				width: 52px !important;
+				height: 52px !important;
 				border-radius: 6px;
 				overflow: hidden;
 				background: var(--grass-05, rgba(23,25,21,0.05));
 			}
 
 			.tgwc-discount-row-thumb img {
-				width: 100%;
-				height: 100%;
+				width: 52px !important;
+				height: 52px !important;
+				max-width: 52px !important;
 				object-fit: cover;
-				display: block;
+				display: block !important;
 			}
 
 			/* Product name */
 			.tgwc-discount-row-name {
-				flex: 1;
+				flex: 1 1 0% !important;
 				min-width: 0;
 				font-family: var(--font-sans, 'DM Sans', sans-serif);
 				font-size: 14px;
 				font-weight: 500;
 				color: var(--grass-100, #171915);
 				line-height: 1.3;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 
 			/* Right side (badge, price, via) */
 			.tgwc-discount-row-end {
-				flex: 0 0 auto;
-				display: flex;
-				flex-direction: column;
-				align-items: flex-end;
+				flex: 0 0 auto !important;
+				display: flex !important;
+				flex-direction: column !important;
+				align-items: flex-end !important;
 				gap: 2px;
+				white-space: nowrap;
 			}
 
 			/* Badge */
