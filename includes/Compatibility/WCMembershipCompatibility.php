@@ -71,6 +71,54 @@ class WCMembershipCompatibility {
 		if ( 'members-area' !== $endpoint_slug ) {
 			add_action( 'woocommerce_account_members-area_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
 		}
+
+		// AJAX add-to-cart handler.
+		add_action( 'wp_ajax_tgwc_ajax_add_to_cart', array( $this, 'ajax_add_to_cart' ) );
+	}
+
+	/**
+	 * AJAX add-to-cart handler.
+	 *
+	 * Adds a simple product to the cart and returns updated cart fragments
+	 * so the cart icon/drawer can update without a page reload.
+	 *
+	 * @since 2.1.0
+	 * @return void
+	 */
+	public function ajax_add_to_cart() {
+		$product_id = isset( $_GET['product_id'] ) ? absint( $_GET['product_id'] ) : 0;
+
+		if ( ! $product_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'customize-my-account-page-for-woocommerce' ) ) );
+		}
+
+		$product = wc_get_product( $product_id );
+		if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+			wp_send_json_error( array( 'message' => __( 'This product cannot be added to your cart.', 'customize-my-account-page-for-woocommerce' ) ) );
+		}
+
+		$added = WC()->cart->add_to_cart( $product_id );
+
+		if ( $added ) {
+			// Get updated cart fragments for the theme's cart widget/drawer.
+			ob_start();
+			wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
+			\WC_AJAX::get_refreshed_fragments();
+			$fragments_json = ob_get_clean();
+			$fragments_data = json_decode( $fragments_json, true );
+
+			wp_send_json_success( array(
+				'message'   => sprintf(
+					/* translators: %s: product name */
+					__( '"%s" added to your cart', 'customize-my-account-page-for-woocommerce' ),
+					$product->get_name()
+				),
+				'fragments' => isset( $fragments_data['fragments'] ) ? $fragments_data['fragments'] : array(),
+				'cart_hash' => isset( $fragments_data['cart_hash'] ) ? $fragments_data['cart_hash'] : '',
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Could not add to cart. It may already be in your cart.', 'customize-my-account-page-for-woocommerce' ) ) );
+		}
 	}
 
 	/**
@@ -471,7 +519,7 @@ class WCMembershipCompatibility {
 						echo '</span>';
 						echo '<span class="tgwc-dc-via">' . esc_html( $disc['plan_name'] ) . '</span>';
 						if ( $product->is_purchasable() && $product->is_in_stock() ) {
-							echo '<a href="' . esc_url( $add_to_cart ) . '" class="tgwc-dc-cart" onclick="event.stopPropagation();">' . esc_html__( 'Add to Cart', 'customize-my-account-page-for-woocommerce' ) . '</a>';
+							echo '<button type="button" class="tgwc-dc-cart" data-product-id="' . esc_attr( $product_id ) . '" onclick="event.stopPropagation();tgwcAddToCart(this,' . esc_attr( $product_id ) . ')">' . esc_html__( 'Add to Cart', 'customize-my-account-page-for-woocommerce' ) . '</button>';
 						}
 					echo '</span>';
 				echo '</div>';
@@ -479,6 +527,67 @@ class WCMembershipCompatibility {
 		}
 
 		echo '</div>';
+
+		// AJAX add-to-cart + toast notification.
+		?>
+		<style id="tgwc-cart-toast-v2.1.7">
+			.tgwc-toast { position: fixed; bottom: 24px; right: 24px; background: #171915; color: #fff; font-family: 'DM Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 8px; z-index: 99999; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; }
+			.tgwc-toast.tgwc-toast--visible { opacity: 1; transform: translateY(0); }
+			.tgwc-dc-cart[disabled] { opacity: 0.5; pointer-events: none; }
+		</style>
+		<script id="tgwc-ajax-cart-v2.1.7">
+		function tgwcAddToCart(btn, productId) {
+			var origText = btn.textContent;
+			btn.disabled = true;
+			btn.textContent = '<?php echo esc_js( __( 'Adding...', 'customize-my-account-page-for-woocommerce' ) ); ?>';
+
+			var data = new FormData();
+			data.append('product_id', productId);
+			data.append('quantity', 1);
+
+			fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>?action=tgwc_ajax_add_to_cart&product_id=' + productId, {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: { 'X-Requested-With': 'XMLHttpRequest' }
+			})
+			.then(function(r) { return r.json(); })
+			.then(function(res) {
+				if (res.success) {
+					btn.textContent = '<?php echo esc_js( __( 'Added!', 'customize-my-account-page-for-woocommerce' ) ); ?>';
+					tgwcShowToast(res.data && res.data.message ? res.data.message : '<?php echo esc_js( __( 'Added to cart', 'customize-my-account-page-for-woocommerce' ) ); ?>');
+					// Trigger WC cart fragments refresh (updates cart icon/drawer).
+					if (window.jQuery) {
+						jQuery(document.body).trigger('wc_fragment_refresh');
+						jQuery(document.body).trigger('added_to_cart', [res.data && res.data.fragments || {}, res.data && res.data.cart_hash || '', jQuery(btn)]);
+					}
+				} else {
+					btn.textContent = '<?php echo esc_js( __( 'Error', 'customize-my-account-page-for-woocommerce' ) ); ?>';
+					tgwcShowToast(res.data && res.data.message ? res.data.message : '<?php echo esc_js( __( 'Could not add to cart', 'customize-my-account-page-for-woocommerce' ) ); ?>');
+				}
+				setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 2000);
+			})
+			.catch(function() {
+				btn.textContent = origText;
+				btn.disabled = false;
+				tgwcShowToast('<?php echo esc_js( __( 'Something went wrong', 'customize-my-account-page-for-woocommerce' ) ); ?>');
+			});
+		}
+
+		function tgwcShowToast(msg) {
+			var existing = document.querySelector('.tgwc-toast');
+			if (existing) existing.remove();
+			var toast = document.createElement('div');
+			toast.className = 'tgwc-toast';
+			toast.textContent = msg;
+			document.body.appendChild(toast);
+			requestAnimationFrame(function() { toast.classList.add('tgwc-toast--visible'); });
+			setTimeout(function() {
+				toast.classList.remove('tgwc-toast--visible');
+				setTimeout(function() { toast.remove(); }, 300);
+			}, 3000);
+		}
+		</script>
+		<?php
 	}
 
 	/**
