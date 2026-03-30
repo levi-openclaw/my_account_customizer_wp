@@ -1,0 +1,166 @@
+*** Customize My Account Page For WooCommerce Changelog ***
+
+2025-10-15 	- version 2.0.1
+* Tweak     - Color opacity slider on color picker.
+* Tweak     - Restore defaults settings improvement.
+* Fix       - Minor design issues.
+* Fix 		- MyAccount page is not responsive.
+* Fix       - Customizer active tab border issue.
+* Fix       - Horizontal navigation dropdown chevron icon issue.
+* Fix       - Issue dropdown open and close state not working on initial load.
+
+2025-09-22 	- version 2.0.0
+* Feature  	- Ajax navigation.
+* Feature 	- Custom icon upload option.
+* Feature 	- Profile upload size limit.
+* Feature 	- Smart Tags for dynamic content.
+* Feature 	- Color palettes option with 4 presets.
+* Feature 	- Option to set a default avatar for users.
+* Feature 	- Menu style options in layout and design.
+* Enhance 	- Improved Builder design.
+* Enhance 	- Revamped Customizer.
+* Enhance 	- Redesigned settings tab.
+* Enhance 	- Improved Builder responsiveness.
+* Enhance 	- Ability to drag endpoints and links into groups.
+* Enhance	- Show icons settings moved to Customizer.
+* Enhance 	- Translation ready – compatible with WPML/Polylang.
+* Enhance 	- Buttons settings moved to Legacy Options inside Customizer.
+* Enhance 	- Content settings moved to Legacy Options inside Customizer.
+* Enhance 	- Navigation settings moved to Legacy Options inside Customizer.
+* Enhance 	- Font family and font size moved to Legacy Options inside Customizer.
+* Enhance 	- Avatar layout and avatar username moved to Legacy Options inside Customizer.
+* Tweak   	- Added preview link in Builder.
+* Tweak   	- Customizer now opens in the same tab.
+* Fix     	- Avatar upload validation issue.
+* Fix 	  	- Invalid inputs accepted in URL field.
+* Fix     	- Content alignment not working in custom content editor.
+* Fix     	- Standardized Select2 implementation across all dashboard settings.
+* Fix 	  	- Disabled logout link during My Account customization via Customizer.
+* Fix 	  	- Custom content editor overlapping with main navigation sidebar in fullscreen mode.
+
+2025-07-11 - version 1.0.2
+* Updated - SCSSPHP library for improved compatibility/performance.
+
+2025-07-04 - version 1.0.1
+* Fix – Design issue in the WYSIWYG editor.
+* Fix – Unable to delete custom links, endpoints, or groups.
+* Fix – Endpoints were not draggable until settings were saved.
+* Fix – Drag-and-drop functionality for endpoints under groups was not working.
+
+2025-07-02 - version 1.0.0
+* Enhancement – Revamped the admin page design.
+
+2025-04-29 - version 0.5.2
+* Enhance – Added toggle functionality for the username and logout button in the avatar section.
+* Fix – Improved compatibility with the BuddyBoss theme.
+* Fix - Design issues with the navigation style tab and right sidebar position.
+
+2025-04-02 - version 0.5.1
+* Fix - Avatar disappears after uploading on the account page.
+* Fix - Endpoint resets to default every time the save button is clicked.
+* Fix - Hidden tab menu when scrolling down in the content section on small screens.
+
+2024-10-29 - version 0.5.0
+* Tweak - Added a filter to show or hide the avatar section along with the username.
+* Fix - Resolved grid issues in the My Account section.
+
+2024-10-22 - version 0.4.9
+* Fix - Endpoint highlighter.
+* Fix - Grid issue in the lost password with woocommerce membership.
+* Fix - Disable whole avatar, username and logut if uncheck the allow user to upload custom avatar.
+
+2023-12-07 - version 0.4.8
+ * Fix: PHP deprecated warnings.
+
+2023-10-16 - version 0.4.7
+ * Enhancement: Support HPOS.
+ * Fix: PHP error.
+
+2023-03-30 - version 0.4.6
+ * Feature: Option to override default content by custom content.
+ * Fix: Possible fatal error.
+
+2023-03-14 - version 0.4.5
+ * Fix: Jetpack CRM compatibility.
+ * Fix: Avatar upload issue.
+ * Fix: Custom endpoints not displaying in the admin nav menu area.
+
+2022-11-10 - version 0.4.4
+ * Fix - Flatsome theme compatibility.
+
+2022-08-17 - version 0.4.3
+ * Feature: Group accordion default state (expanded/collapsed) option.
+ * Tweak: Only show membership endpoint if user has membership.
+
+2022-06-30 - version 0.4.2
+ * Fix: WooCommerce Memberships compatibility.
+ * Enhancement: Compatible with Teams for WooCommerce Memberships.
+ * Enhancement: Make Google fonts compliant with GDPR.
+ * Dev: Introduced `tgwc_get_endpoints` filter.
+
+2022-03-16 - version 0.4.1
+ * Fix: Layout issue.
+ * Fix: Settings modal close button design issue.
+ * Fix: Button border width customize options issue.
+ * Fix: Compatibility issue with other WC extensions.
+ * Dev: Introduced `tgwc_before_account_navigation` and `tgwc_after_account_navigation` action hooks.
+ * Feature: Content customize options.
+ * Feature: Navigation wrapper padding and margin options.
+ * Enhancement: Minify dynamic CSS.
+
+2022-03-07 - version 0.4.0
+ * Fix: translation issues.
+ * Fix: Frontend styles applied after some delay.
+ * Fix: Dynamic CSS invalid property.
+ * Fix: Endpoint and debug settings.
+ * Added: Group accordion icon enable/disable setting.
+ * Added: Customizer preview shortcut buttons.
+ * Added: Navigation active state customize options.
+ * Feature: Customizer reset.
+ * Feature: Custom content position option.
+ * Enhancement: Support WPML and Polylang translation plugins.
+ * Enhancement: Loading of frontend scripts.
+ * Enhancement: Improve compatibility with other WC plugins.
+ * Enhancement: Group accordion feature.
+
+2021-06-03 - version 0.3.0
+ * Fix: Avatar upload issue.
+ * Enhancement: Show the avatar upload and remove button only on hover over the avatar image.
+ * Enhancement: Add debug features to load non-minified assets and selectively load frontend assets.
+
+2021-03-30 - version 0.2.5
+ * Fix: Find the .woocommerce div even if it is multiple levels up.
+ * Enhancement: Rename **my-account.css** with a timestamp every time the customization is saved to bust cache.
+
+2020-12-01 - version 0.2.4
+ * Fix: Default endpoint not working.
+ * Fix: Support shortcode and <iframe> in endpoint content.
+
+2020-10-06 - version 0.2.3
+ * Fix: Endpoints saved message shown when design customization is reset.
+ * Fix: Post and Page title is set to `(no title)` when the default endpoint is other than `dashboard`.
+
+2020-09-08 - version 0.2.2
+ * Fix: Increase the priority of `body_class` filter so the custom body class `tgwc-woocommerce-customize-my-account` is added.
+ * Tweak: Compatible with WooCommerce Membership by SkyVerge.
+
+2020-08-17 - version 0.2.1
+ * Fix: Admin menu icon flicker.
+ * Enhancement: Filter build in slugs like page, pagename, page_id and preview .
+ * Enhancement: Strong slug validation.
+ * Enhancement: Set the minimum slug characters to 3.
+ * Tweak: Compatible with WordPress 5.5
+ * Tweak: Compatible with WooCommerce 4.3.3
+
+2020-08-02 - version 0.2.0
+ * Enhancement: Used jQuery tooltip for displaying tooltip
+ * Enhancement: Add the custom content for default endpoints instead of overriding the content of defaule endpoints.
+ * Enhancement: Allow to change the slug for custom endpoints.
+ * Enhancement: Validate the label and slug.
+ * Tweak: Compatibility with WooCommerce Subscriptions and Bookings extensions.
+ * Fix: Fullwidth layout template issue with Storefront theme.
+ * Fix: Design issue with login form when the registration form is disabled.
+ * Fix: Customization is not saved when font size is not set.
+
+2020-06-10 - version 0.1.0
+ * Initial Release

@@ -1,0 +1,1459 @@
+# Copyright (C) 2025 ThemeGrill
+# This file is distributed under the GNU General Public License v3.0.
+msgid ""
+msgstr ""
+"Project-Id-Version: Customize My Account Page For Woocommerce 2.0.1\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/customize-my-account-page-for-"
+"woocommerce\n"
+"POT-Creation-Date: 2025-10-15 06:19:42+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2025-MO-DA HO:MI+ZONE\n"
+"Last-Translator: WPEverest <https://wpeverest.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Country: United States\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: "
+"__;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_"
+"attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;esc_html_x:1,2c;\n"
+"X-Poedit-Basepath: ../\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-Bookmarks: \n"
+"X-Textdomain-Support: yes\n"
+"X-Generator: grunt-wp-i18n 1.0.4\n"
+
+#: customize-my-account-page-for-woocommerce.php:34
+msgid "Dismiss this notice."
+msgstr ""
+
+#: includes/AccountMenu.php:124
+msgid "Dashboard"
+msgstr ""
+
+#: includes/AccountMenu.php:125
+msgid "Orders"
+msgstr ""
+
+#: includes/AccountMenu.php:126
+msgid "Downloads"
+msgstr ""
+
+#: includes/AccountMenu.php:127
+msgid "Addresses"
+msgstr ""
+
+#: includes/AccountMenu.php:128
+msgid "Payment Methods"
+msgstr ""
+
+#: includes/AccountMenu.php:129
+msgid "Account Details"
+msgstr ""
+
+#: includes/AccountMenu.php:130
+msgid "Log out"
+msgstr ""
+
+#: includes/AccountMenu.php:138
+msgid "Memberships"
+msgstr ""
+
+#: includes/AccountMenu.php:143
+msgid "Subscriptions"
+msgstr ""
+
+#: includes/AccountMenu.php:148
+msgid "Team"
+msgstr ""
+
+#: includes/Ajax.php:117 includes/Ajax.php:323
+msgid "User is not logged in"
+msgstr ""
+
+#: includes/Ajax.php:124 includes/Ajax.php:330
+msgid "Nonce is required"
+msgstr ""
+
+#: includes/Ajax.php:132 includes/Ajax.php:339
+msgid "Invalid nonce"
+msgstr ""
+
+#: includes/Ajax.php:142
+msgid "File is required"
+msgstr ""
+
+#: includes/Ajax.php:180
+msgid "Temporary file is not readable"
+msgstr ""
+
+#: includes/Ajax.php:190
+msgid "Invalid image type. Only JPG and PNG are allowed."
+msgstr ""
+
+#: includes/Ajax.php:196
+msgid "Could not read file contents"
+msgstr ""
+
+#: includes/Ajax.php:205
+msgid "The image appears to be corrupted"
+msgstr ""
+
+#: includes/Ajax.php:225
+msgid "Image contains suspicious content"
+msgstr ""
+
+#: includes/Ajax.php:236
+msgid "Suspicious image metadata"
+msgstr ""
+
+#: includes/Ajax.php:268
+msgid "Something went wrong, try again"
+msgstr ""
+
+#: includes/Ajax.php:305
+msgid "Uploaded successfully"
+msgstr ""
+
+#: includes/Ajax.php:350
+msgid "File deleted successfully"
+msgstr ""
+
+#: includes/Ajax.php:354
+msgid "Missing the attchment id."
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:80
+msgid "Profile Settings"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:103
+msgid "Profile Picture Placeholder"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:104
+msgid "Default image for users without profile pictures"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:117
+msgid "Profile Picture Size Limit"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:118
+msgid "Maximum file size(KB) for uploaded images"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:137
+msgid "Profile Picture Style"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:144
+msgid "Square"
+msgstr ""
+
+#: includes/Customizer/Config/Avatar.php:150
+msgid "Circle"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:72
+msgid "Layout & Design"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:110
+msgid "Menu Position"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:111
+msgid "Choose where the navigation menu appears"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:118
+msgid "Vertical Left"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:124
+msgid "Vertical Right"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:130
+msgid "Horizontal"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:140
+msgid "Default"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:143
+msgid "Modern"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:146
+msgid "Classic"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:151
+#: includes/Functions/CoreFunctions.php:1783
+msgid "Legacy"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:161
+msgid "Menu Style"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:162
+msgid "Select the visual appearance of your menu"
+msgstr ""
+
+#: includes/Customizer/Config/Layout.php:183
+msgid "Color palette"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:26
+msgid "Avatar"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:40
+msgid "Avatar Layout"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:41
+msgid "Choose Avatar layout"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:47
+msgid "Avatar left aligned"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:53
+msgid "Avatar right aligned"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:59
+msgid "Avatar center aligned"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:65
+msgid "Avatar vertical aligned"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:81
+msgid "Avatar Username"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyAvatar.php:82
+msgid "Enable and disble to hide the username"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:26
+#: includes/Customizer/Config/Legacy/LegacyButton.php:262
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:38
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:79
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:92
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:413
+msgid "General"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:39
+#: includes/Customizer/Config/Legacy/LegacyWrapper.php:76
+#: includes/Customizer/Config/Navigation.php:110
+msgid "Font Size"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:40
+msgid "Choose font size"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:59
+msgid "Line Height"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:60
+msgid "Choose line height"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:78
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:133
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:284
+msgid "Normal State"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:91
+#: includes/Customizer/Config/Legacy/LegacyButton.php:183
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:171
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:289
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:83
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:193
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:323
+msgid "Border"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:92
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:290
+msgid "Choose border style"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:96
+#: includes/Customizer/Config/Legacy/LegacyButton.php:188
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:176
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:294
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:88
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:198
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:328
+msgid "None"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:97
+#: includes/Customizer/Config/Legacy/LegacyButton.php:189
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:177
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:295
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:89
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:199
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:329
+msgid "Solid"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:98
+#: includes/Customizer/Config/Legacy/LegacyButton.php:190
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:178
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:296
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:90
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:200
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:330
+msgid "Dotted"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:99
+#: includes/Customizer/Config/Legacy/LegacyButton.php:191
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:179
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:297
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:91
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:201
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:331
+msgid "Dashed"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:100
+#: includes/Customizer/Config/Legacy/LegacyButton.php:192
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:180
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:298
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:92
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:202
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:332
+msgid "Double"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:101
+#: includes/Customizer/Config/Legacy/LegacyButton.php:193
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:181
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:299
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:93
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:203
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:333
+msgid "Groove"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:102
+#: includes/Customizer/Config/Legacy/LegacyButton.php:194
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:182
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:300
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:94
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:204
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:334
+msgid "Ridge"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:103
+#: includes/Customizer/Config/Legacy/LegacyButton.php:195
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:183
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:301
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:95
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:205
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:335
+msgid "Inset"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:104
+#: includes/Customizer/Config/Legacy/LegacyButton.php:196
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:184
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:302
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:96
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:206
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:336
+msgid "Outset"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:105
+#: includes/Customizer/Config/Legacy/LegacyButton.php:197
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:185
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:303
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:97
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:207
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:337
+msgid "hidden"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:106
+#: includes/Customizer/Config/Legacy/LegacyButton.php:198
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:186
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:304
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:98
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:208
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:338
+msgid "Inherit"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:122
+#: includes/Customizer/Config/Legacy/LegacyButton.php:214
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:202
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:320
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:114
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:224
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:354
+msgid "Border Width"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:123
+msgid "Border width description"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:170
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:154
+msgid "Hover State"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:184
+msgid "Choose background border style"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:215
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:203
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:321
+msgid "Set border width"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:279
+#: includes/Customizer/Config/Legacy/LegacyContent.php:91
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:55
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:109
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:433
+#: includes/Customizer/Config/Spacing.php:153
+#: includes/Customizer/Config/Spacing.php:196
+#: includes/Customizer/Config/Spacing.php:276
+msgid "Padding"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:280
+msgid "Set Padding"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:308
+#: includes/Customizer/Config/Legacy/LegacyContent.php:62
+#: includes/Customizer/Config/Spacing.php:126
+#: includes/Customizer/Config/Spacing.php:226
+msgid "Margin"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyButton.php:309
+msgid "Set Margin"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyContent.php:27
+msgid "Content"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyContent.php:63
+msgid "Set Content Margin"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyContent.php:92
+msgid "Set Content Padding"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:26
+msgid "Input Field"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:56
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:110
+msgid "Set padding"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:172
+msgid "Choose background border"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:251
+msgid "Focus State"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyInputField.php:369
+msgid "Button"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:26
+msgid "Navigation"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:49
+msgid "Icon Position"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:50
+msgid "Choose Icon Position"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:56
+#: includes/Customizer/Controls/Dimension.php:250
+msgid "Left"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:59
+#: includes/Customizer/Controls/Dimension.php:248
+msgid "Right"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:71
+msgid "Active State"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:84
+msgid "Select active background border style"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:115
+msgid "Set tab active border width"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:194
+msgid "Select hover background border style"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:225
+msgid "Set tab hover border width"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:324
+msgid "Select tab background border"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:355
+msgid "Set tab border width"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyNavigation.php:434
+msgid "Set navigation item padding."
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyWrapper.php:26
+msgid "Wrapper"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyWrapper.php:39
+msgid "Font Family"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyWrapper.php:40
+msgid "Select a desire Google font."
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyWrapper.php:77
+msgid "Customize the font size."
+msgstr ""
+
+#: includes/Customizer/Config/Legacy.php:79
+msgid "Legacy Options"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:72
+msgid "Navigation Menu"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:111
+msgid "Adjust the size of menu text"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:130
+msgid "Show Icons"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:131
+msgid "Display icons next to menu items"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:145
+msgid "Grouped Menu Sections"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:146
+msgid "Should menu sections start open or closed?"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:152
+msgid "Closed"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:155
+msgid "Opened"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:181
+msgid "Logout Button"
+msgstr ""
+
+#: includes/Customizer/Config/Navigation.php:182
+msgid ""
+"Include logout option in the menu. (Enabling the Logout Button disables the "
+"logout link endpoint.)"
+msgstr ""
+
+#: includes/Customizer/Config/Spacing.php:72
+msgid "Spacing"
+msgstr ""
+
+#: includes/Customizer/Config/Spacing.php:108
+msgid "Page Container"
+msgstr ""
+
+#: includes/Customizer/Config/Spacing.php:176
+msgid "Menu Container"
+msgstr ""
+
+#: includes/Customizer/Config/Spacing.php:249
+msgid "Profile Picture"
+msgstr ""
+
+#: includes/Customizer/Config/Spacing.php:277
+msgid "Set Avatar Padding"
+msgstr ""
+
+#: includes/Customizer/Config/Template.php:71
+#: includes/Customizer/Customizer.php:229
+msgid "Default Template"
+msgstr ""
+
+#: includes/Customizer/Config/Template.php:72
+msgid ""
+"Looking for a template? You can browse our templates, import and preview "
+"templates, then activate them right here."
+msgstr ""
+
+#: includes/Customizer/Config/Template.php:73
+msgid ""
+"While previewing a new template, you can continue to tailor things like "
+"form styles and custom css, and explore template-specific options."
+msgstr ""
+
+#: includes/Customizer/Controls/Dimension.php:226
+msgid "Desktop"
+msgstr ""
+
+#: includes/Customizer/Controls/Dimension.php:230
+msgid "Tablet"
+msgstr ""
+
+#: includes/Customizer/Controls/Dimension.php:234
+msgid "Mobile"
+msgstr ""
+
+#: includes/Customizer/Controls/Dimension.php:247
+msgid "Top"
+msgstr ""
+
+#: includes/Customizer/Controls/Dimension.php:249
+msgid "Bottom"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:162
+msgid "My Account Page"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:163
+msgid ""
+"WooCommerce Customizer &ndash; Allows you to preview changes and customize "
+"MyAccount page."
+msgstr ""
+
+#: includes/Customizer/Customizer.php:166
+#: includes/WoocommerceCustomizer.php:608
+msgid "Reset"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:168
+msgid "Warning! this will remove all my-account page customizations."
+msgstr ""
+
+#: includes/Customizer/Customizer.php:230
+msgid "Classic Layout"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:425
+msgid "Invalid filesystem credentials"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:476
+msgid "ScssPhp: Unable to compile content"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:492
+msgid "Save"
+msgstr ""
+
+#: includes/Customizer/Customizer.php:495
+msgid "Saved"
+msgstr ""
+
+#: includes/Customizer/Section.php:42
+#: includes/Customizer/Sections/Template.php:42
+msgid "Active template"
+msgstr ""
+
+#: includes/Customizer/Section.php:45
+#: includes/Customizer/Sections/Template.php:45
+msgid "Change template"
+msgstr ""
+
+#: includes/Customizer/Section.php:52
+#: includes/Customizer/Sections/Template.php:52
+msgid "Back"
+msgstr ""
+
+#: includes/Customizer/Section.php:56
+#: includes/Customizer/Sections/Template.php:56
+msgid "You are browsing"
+msgstr ""
+
+#: includes/Customizer/Section.php:58
+#: includes/Customizer/Sections/Template.php:58
+msgid "Templates"
+msgstr ""
+
+#: includes/Customizer/Section.php:61
+#: includes/Customizer/Sections/Template.php:61
+msgid "Help"
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:370
+#. translators: The upload_max_filesize directive in php.ini
+msgid "The uploaded file exceeds the upload_max_filesize (%s) directive in php.ini."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:373
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
+"the HTML form."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:374
+msgid "The uploaded file was only partially uploaded."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:375
+msgid "No file was uploaded."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:376
+msgid "Missing a temporary folder."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:377
+msgid "Failed to write file to disk."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:378
+msgid "File upload stopped by extension."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:1267
+#: includes/Functions/CoreFunctions.php:1268
+msgid "Click to edit this element."
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:1482
+#: includes/Functions/CoreFunctions.php:1556
+#: includes/Functions/CoreFunctions.php:1650
+msgid "Brick Red"
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:1500
+#: includes/Functions/CoreFunctions.php:1579
+#: includes/Functions/CoreFunctions.php:1674
+msgid "Forest Green"
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:1518
+#: includes/Functions/CoreFunctions.php:1602
+#: includes/Functions/CoreFunctions.php:1698
+msgid "Royal Blue"
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:1536
+#: includes/Functions/CoreFunctions.php:1625
+#: includes/Functions/CoreFunctions.php:1722
+msgid "Sunset Orange"
+msgstr ""
+
+#: includes/Functions/CoreFunctions.php:1910
+msgid "Default Avatar"
+msgstr ""
+
+#: includes/Functions/Formatting.php:772
+msgid "Day(s)"
+msgstr ""
+
+#: includes/Functions/Formatting.php:773
+msgid "Week(s)"
+msgstr ""
+
+#: includes/Functions/Formatting.php:774
+msgid "Month(s)"
+msgstr ""
+
+#: includes/Functions/Formatting.php:775
+msgid "Year(s)"
+msgstr ""
+
+#: includes/Notice.php:81
+msgid "Dismiss"
+msgstr ""
+
+#: includes/Settings.php:57 includes/Settings.php:549
+msgid "Endpoints"
+msgstr ""
+
+#: includes/Settings.php:58 includes/Settings.php:558
+msgid "Customizer"
+msgstr ""
+
+#: includes/Settings.php:59 includes/Settings.php:566
+#: includes/WoocommerceCustomizer.php:271
+#: templates/admin/dialogs/restore-defaults.php:29
+msgid "Settings"
+msgstr ""
+
+#: includes/Settings.php:153
+msgid "Customization reset successfully."
+msgstr ""
+
+#: includes/Settings.php:231
+msgid "Settings reset successfully."
+msgstr ""
+
+#: includes/Settings.php:272
+msgid "Settings saved successfully"
+msgstr ""
+
+#: includes/Settings.php:299 includes/Settings.php:879
+msgid "Nonce is required."
+msgstr ""
+
+#: includes/Settings.php:310 includes/Settings.php:890
+msgid "Invalid nonce."
+msgstr ""
+
+#: includes/Settings.php:335
+msgid "Endpoints reset successfully."
+msgstr ""
+
+#: includes/Settings.php:369 includes/WoocommerceCustomizer.php:345
+msgid "Invalid URL. Must be a full URL (https://...) or a hash link (#section)."
+msgstr ""
+
+#: includes/Settings.php:516
+msgid "Endpoints saved successfully"
+msgstr ""
+
+#: includes/Settings.php:537 includes/Settings.php:548
+#: includes/Settings.php:557 includes/Settings.php:565
+msgid "Customize My Account Page For WooCommerce"
+msgstr ""
+
+#: includes/Settings.php:538
+msgid "Customize My Account"
+msgstr ""
+
+#: includes/Settings.php:900
+msgid "Debug settings reset successfully."
+msgstr ""
+
+#: includes/Settings.php:928
+msgid "Debug settings saved successfully"
+msgstr ""
+
+#: includes/SmartTags.php:47
+msgid "Add Smart Tags"
+msgstr ""
+
+#: includes/SmartTags.php:188
+msgid "You have not set up this type of address yet."
+msgstr ""
+
+#: includes/SmartTags.php:248
+msgid "User ID"
+msgstr ""
+
+#: includes/SmartTags.php:249
+msgid "User Name"
+msgstr ""
+
+#: includes/SmartTags.php:250
+msgid "User Email"
+msgstr ""
+
+#: includes/SmartTags.php:251
+msgid "First Name"
+msgstr ""
+
+#: includes/SmartTags.php:252
+msgid "Last Name"
+msgstr ""
+
+#: includes/SmartTags.php:253
+msgid "User Display Name"
+msgstr ""
+
+#: includes/SmartTags.php:254
+msgid "User IP Address"
+msgstr ""
+
+#: includes/SmartTags.php:255
+msgid "Site Name"
+msgstr ""
+
+#: includes/SmartTags.php:256
+msgid "Site URL "
+msgstr ""
+
+#: includes/SmartTags.php:257
+msgid "Page URL"
+msgstr ""
+
+#: includes/SmartTags.php:258
+msgid "Current Date"
+msgstr ""
+
+#: includes/SmartTags.php:259
+msgid "Current Time"
+msgstr ""
+
+#: includes/SmartTags.php:260
+msgid "Billing address"
+msgstr ""
+
+#: includes/SmartTags.php:261
+msgid "Billing Company"
+msgstr ""
+
+#: includes/SmartTags.php:262
+msgid "Shipping address"
+msgstr ""
+
+#: includes/SmartTags.php:263
+msgid "Shipping Company"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:346
+msgid "Smart Tags"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:347
+msgid "Search Tags..."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:602
+msgid "Enable"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:603
+msgid "Remove"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:604
+msgid "Select an icon"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:605
+msgid "Select user roles"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:606
+msgid "Cancel"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:607
+msgid "Delete"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:609
+msgid "Add"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:610
+msgid "Not available "
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:611
+msgid "Available "
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:612
+msgid "Slug cannot be empty "
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:613
+msgid "Settings "
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:614
+msgid "Design Customization "
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:615
+msgid ""
+"Restore the general settings and remove the added endpoints, group and "
+"links."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:616
+msgid "Remove all the design customization."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:617
+msgid "Invalid slug. "
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:618
+msgid "Label cannot be empty."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:619
+msgid "Could Not Save Changes."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:620
+msgid "Please resolve the following errors and try again."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:621
+msgid "ok"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:622
+msgid ""
+"Slug can only contains alphabets,numbers, underscore(_) and dash(-) "
+"characters."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:623
+msgid "Slug must begin and end with alphabets and numbers."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:624
+msgid "Slug must be 3 characters in length."
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:625 templates/admin/customization.php:43
+msgid "Save Changes"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:626
+msgid "Discard"
+msgstr ""
+
+#: includes/WoocommerceCustomizer.php:761
+msgid ""
+"WooCommerce is required for this plugin to work. Please, activate "
+"WooCommerce first."
+msgstr ""
+
+#: templates/admin/customization.php:49
+msgid "Restore Defaults"
+msgstr ""
+
+#: templates/admin/dialogs/restore-defaults.php:13
+msgid "Confirm Restore"
+msgstr ""
+
+#: templates/admin/dialogs/restore-defaults.php:16
+msgid ""
+"All changes will be reverted to default, and custom endpoints will be "
+"deleted."
+msgstr ""
+
+#: templates/admin/dialogs/restore-defaults.php:23
+msgid "Endpoint"
+msgstr ""
+
+#: templates/admin/dialogs/restore-defaults.php:35
+msgid "Design Customization"
+msgstr ""
+
+#: templates/admin/endpoint-dialog.php:14
+msgid "Name"
+msgstr ""
+
+#: templates/admin/endpoint-tab.php:40
+msgid "Logout Button is active, disable it in customizer to enable this."
+msgstr ""
+
+#: templates/admin/endpoint-tab.php:70 templates/admin/endpoint-tab.php:119
+msgid "This is a default endpoint and cannot be deleted."
+msgstr ""
+
+#: templates/admin/endpoint-tab.php:77 templates/admin/endpoint-tab.php:84
+msgid "Drag items here"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:47
+#. translators: %s is the link to the Customizer > Navigation Settings
+msgid ""
+"This logout link is disabled because logout button is active. To enable "
+"this link, disable logout button on %s first"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:58 templates/admin/js/endpoint.php:34
+msgid "Endpoint Label"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:59 templates/admin/js/endpoint.php:35
+msgid "The display name shown for this tab in the My Account menu."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:75
+msgid "Slug"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:76 templates/admin/js/endpoint.php:51
+msgid "The text that appears in the URL for this tab."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:94 templates/admin/js/endpoint.php:67
+msgid "Endpoint Icon"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:95 templates/admin/js/endpoint.php:68
+msgid "Choose or upload an icon to display for this tab on the My Account page."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:123
+#: templates/admin/endpoints/endpoint.php:137
+#: templates/admin/endpoints/group.php:81
+#: templates/admin/endpoints/group.php:95 templates/admin/endpoints/link.php:94
+#: templates/admin/endpoints/link.php:111 templates/admin/js/endpoint.php:91
+#: templates/admin/js/endpoint.php:105 templates/admin/js/group.php:76
+#: templates/admin/js/group.php:90 templates/admin/js/link.php:90
+#: templates/admin/js/link.php:104
+msgid "Choose Icon"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:191
+#: templates/admin/endpoints/group.php:149
+#: templates/admin/endpoints/link.php:165 templates/admin/js/endpoint.php:156
+#: templates/admin/js/group.php:141 templates/admin/js/link.php:155
+msgid "CSS Class"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:192
+#: templates/admin/endpoints/group.php:150
+#: templates/admin/endpoints/link.php:166 templates/admin/js/endpoint.php:157
+#: templates/admin/js/group.php:142 templates/admin/js/link.php:156
+msgid "Add additional CSS classes for advanced styling."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:207
+#: templates/admin/endpoints/group.php:165
+#: templates/admin/endpoints/link.php:181 templates/admin/js/endpoint.php:172
+#: templates/admin/js/group.php:157 templates/admin/js/link.php:170
+msgid "User Roles"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:208
+#: templates/admin/js/endpoint.php:173
+msgid ""
+"Choose which types of users (e.g., customers, shop managers, or "
+"administrators) can view this tab."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:223
+msgid "Custom Content"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:224
+#: templates/admin/js/endpoint.php:188
+msgid ""
+"Add content to show on this tab on My Account page. Supports text, "
+"shortcodes, media, and HTML."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:254
+#: templates/admin/js/endpoint.php:202
+msgid "Custom Content Position"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:255
+#: templates/admin/js/endpoint.php:203
+msgid "Choose the location where custom content should appear."
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:261
+#: templates/admin/js/endpoint.php:209
+msgid "Before default content"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:262
+msgid "Override default content"
+msgstr ""
+
+#: templates/admin/endpoints/endpoint.php:263
+#: templates/admin/js/endpoint.php:210
+msgid "After default content"
+msgstr ""
+
+#: templates/admin/endpoints/group.php:35 templates/admin/js/group.php:36
+msgid "Group Label"
+msgstr ""
+
+#: templates/admin/endpoints/group.php:36 templates/admin/js/group.php:37
+msgid "The display name shown for this group in the My Account menu."
+msgstr ""
+
+#: templates/admin/endpoints/group.php:52 templates/admin/js/group.php:52
+msgid "Group Icon"
+msgstr ""
+
+#: templates/admin/endpoints/group.php:53 templates/admin/js/group.php:53
+msgid "Choose or upload an icon to display for this group on the My Account page."
+msgstr ""
+
+#: templates/admin/endpoints/group.php:166 templates/admin/js/group.php:158
+msgid ""
+"Choose which types of users (e.g., customers, shop managers, or "
+"administrators) can view this group."
+msgstr ""
+
+#: templates/admin/endpoints/link.php:35 templates/admin/js/link.php:34
+msgid "URL"
+msgstr ""
+
+#: templates/admin/endpoints/link.php:36 templates/admin/js/link.php:35
+msgid "The web address that this tab opens."
+msgstr ""
+
+#: templates/admin/endpoints/link.php:51 templates/admin/js/link.php:50
+msgid "Link Label"
+msgstr ""
+
+#: templates/admin/endpoints/link.php:52 templates/admin/js/link.php:51
+msgid "The display name shown for this link in the My Account menu."
+msgstr ""
+
+#: templates/admin/endpoints/link.php:68 templates/admin/js/link.php:66
+msgid "Link Icon"
+msgstr ""
+
+#: templates/admin/endpoints/link.php:95 templates/admin/js/link.php:67
+msgid "Choose or upload an icon to display for this link on the My Account page."
+msgstr ""
+
+#: templates/admin/endpoints/link.php:182 templates/admin/js/link.php:171
+msgid ""
+"Choose which types of users (e.g., customers, shop managers, or "
+"administrators) can view this link."
+msgstr ""
+
+#: templates/admin/endpoints/link.php:197 templates/admin/js/link.php:185
+msgid "Open Link In a New Tab?"
+msgstr ""
+
+#: templates/admin/endpoints/link.php:198
+msgid "Allow link to open in a new tab."
+msgstr ""
+
+#: templates/admin/js/endpoint.php:50
+msgid "slug"
+msgstr ""
+
+#: templates/admin/js/endpoint.php:187
+msgid "Endpoint Custom Content"
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:19
+msgid "Enable Debug"
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:21
+msgid "Enabling this option will load unminified JS scripts and CSS styles."
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:35
+msgid "Enable debug mode."
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:42
+msgid "Frontend Libraries"
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:43
+msgid ""
+"You can enable/disable javascript libraries which are loaded in WooCommerce "
+"MyAccount Page to resolve library conflict with other plugins."
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:50
+msgid "Dropzone"
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:56
+#: templates/admin/tab-content/debug.php:77
+msgid "CSS"
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:63
+#: templates/admin/tab-content/debug.php:84
+msgid "JS"
+msgstr ""
+
+#: templates/admin/tab-content/debug.php:71
+msgid "jQuery Scroll Tabs"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:32 templates/admin/tabs.php:52
+msgid "Add Tab"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:60
+msgid "Confirm Delete"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:63
+msgid "It will be permanently deleted and cannot be recovered. Are you sure?"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:68
+msgid "Do you want to continue?"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:71
+msgid "Unsaved changes will be permanently lost. Discard anyway."
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:76
+msgid "Select Your Tab Type"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:82 templates/admin/tabs.php:36
+msgid "Add endpoint"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:83 templates/admin/tabs.php:37
+msgid "Add group"
+msgstr ""
+
+#: templates/admin/tab-content/endpoints.php:84 templates/admin/tabs.php:38
+msgid "Add link"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:19
+msgid "Default Endpoint"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:20
+msgid "Select which tab users will see first when they visit their account page."
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:43
+msgid "Account Profile Picture"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:44
+msgid ""
+"Allow customers to upload a profile picture on their WooCommerce account "
+"page."
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:61
+msgid "AJAX Account Navigation"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:62
+msgid ""
+"Load account page tabs without full page reload for smoother navigation "
+"experience."
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:82
+msgid "Load Unminified Assets"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:83
+msgid "Load uncompressed CSS and JS files to help with debugging and development."
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:99
+msgid "Account Page Libraries"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:100
+msgid ""
+"Control which CSS and JS libraries are loaded on the WooCommerce account "
+"page. Uncheck to test for theme or plugin conflicts."
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:106
+msgid "Dropzone - CSS"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:113
+msgid "Dropzone - JS"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:119
+msgid "jQuery Scroll Tabs - CSS"
+msgstr ""
+
+#: templates/admin/tab-content/settings.php:126
+msgid "jQuery Scroll Tabs - JS"
+msgstr ""
+
+#: templates/frontend/user-avatar.php:15
+msgid "Upload failed. Maximum allowed size is %s MB."
+msgstr ""
+
+#: templates/frontend/user-avatar.php:77
+msgid "Logout"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Customize My Account Page For Woocommerce"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://woocommerce.com/products/customize-my-account-page-for-woocommerce/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Allows you to register custom WooCommerce tabs on my-account page and "
+"customize the design."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "ThemeGrill"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://themegrill.com"
+msgstr ""
+
+#: includes/Customizer/Config/Legacy/LegacyWrapper.php:46
+msgctxt "enhanced select"
+msgid "Select Font Family&hellip;"
+msgstr ""
+
+#: includes/Customizer/Section.php:45
+#: includes/Customizer/Sections/Template.php:45
+msgctxt "template"
+msgid "Change"
+msgstr ""
