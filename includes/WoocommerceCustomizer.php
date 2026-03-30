@@ -13,6 +13,7 @@ use ThemeGrill\WoocommerceCustomizer\Compatibility\JetpackCRMCompatibility;
 use ThemeGrill\WoocommerceCustomizer\Customizer\Customizer;
 use ThemeGrill\WoocommerceCustomizer\Compatibility\WCMembershipCompatibility;
 use ThemeGrill\WoocommerceCustomizer\Compatibility\WCMembershipForTeamsCompatibility;
+use ThemeGrill\WoocommerceCustomizer\Compatibility\WCSubscriptionsCompatibility;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -196,6 +197,7 @@ final class WoocommerceCustomizer {
 	public function init_compatibilities() {
 		WCMembershipCompatibility::instance();
 		WCMembershipForTeamsCompatibility::instance();
+		WCSubscriptionsCompatibility::instance();
 		FlatsomeCompatibility::instance();
 		JetpackCRMCompatibility::instance();
 	}
