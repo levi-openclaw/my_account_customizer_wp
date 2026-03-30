@@ -169,24 +169,29 @@ class WCMembershipCompatibility {
 		// Remove default WCM rendering so we fully control output.
 		$this->remove_default_members_area_output();
 
-		// Build tab sections. Each section is only rendered if it has content.
-		$tabs = array(
-			'memberships' => array(
-				'label'    => __( 'Memberships', 'customize-my-account-page-for-woocommerce' ),
-				'callback' => array( $this, 'render_memberships_overview' ),
-			),
-			'discounts'   => array(
-				'label'    => __( 'Discounts', 'customize-my-account-page-for-woocommerce' ),
-				'callback' => array( $this, 'render_combined_discounts' ),
-			),
-			'content'     => array(
+		// Build tab sections. Content comes first if available.
+		$has_content = $this->memberships_have_content( $user_memberships );
+
+		$tabs = array();
+
+		if ( $has_content ) {
+			$tabs['content'] = array(
 				'label'    => __( 'Content', 'customize-my-account-page-for-woocommerce' ),
 				'callback' => array( $this, 'render_combined_content' ),
-			),
-			'products'    => array(
-				'label'    => __( 'Products', 'customize-my-account-page-for-woocommerce' ),
-				'callback' => array( $this, 'render_combined_products' ),
-			),
+			);
+		}
+
+		$tabs['memberships'] = array(
+			'label'    => __( 'Memberships', 'customize-my-account-page-for-woocommerce' ),
+			'callback' => array( $this, 'render_memberships_overview' ),
+		);
+		$tabs['discounts'] = array(
+			'label'    => __( 'Discounts', 'customize-my-account-page-for-woocommerce' ),
+			'callback' => array( $this, 'render_combined_discounts' ),
+		);
+		$tabs['products'] = array(
+			'label'    => __( 'Products', 'customize-my-account-page-for-woocommerce' ),
+			'callback' => array( $this, 'render_combined_products' ),
 		);
 
 		$tabs = apply_filters( 'tgwc_membership_unified_tabs', $tabs );
@@ -456,6 +461,42 @@ class WCMembershipCompatibility {
 		}
 
 		echo '</div>'; // grid
+	}
+
+	/**
+	 * Check whether any of the user's memberships have restricted content.
+	 *
+	 * Lightweight check that returns true as soon as at least one valid
+	 * content item is found (does not build the full list).
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param \WC_Memberships_User_Membership[] $memberships User memberships.
+	 * @return bool
+	 */
+	private function memberships_have_content( $memberships ) {
+		foreach ( $memberships as $membership ) {
+			$plan = $membership->get_plan();
+			if ( ! $plan || ! $membership->is_active() ) {
+				continue;
+			}
+
+			$rules = $plan->get_content_restriction_rules();
+			if ( empty( $rules ) ) {
+				continue;
+			}
+
+			foreach ( $rules as $rule ) {
+				$object_ids = $rule->get_object_ids();
+				foreach ( $object_ids as $object_id ) {
+					$post = get_post( $object_id );
+					if ( $post && 'publish' === $post->post_status ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
