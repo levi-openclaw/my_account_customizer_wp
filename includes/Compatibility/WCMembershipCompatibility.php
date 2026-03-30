@@ -57,16 +57,20 @@ class WCMembershipCompatibility {
 		add_action( 'tgwc_my_account_menu_item', array( $this, 'wc_membership_navigation' ), 1 );
 		add_action( 'wp_head', array( $this, 'output_membership_css' ) );
 
-		// Always show the memberships list table first, even when the user
-		// has only one membership. This prevents the auto-redirect into a
-		// single membership's detail view.
+		// Prevent WCM from redirecting single-membership users to the detail view.
 		add_filter( 'wc_memberships_redirect_single_membership', '__return_false' );
-		add_filter( 'wc_memberships_members_area_my-memberships-section-args', array( $this, 'force_memberships_list' ) );
+		add_action( 'template_redirect', array( $this, 'block_membership_redirect' ), 0 );
 
-		// Render unified members area (combined content, discounts, products
-		// across all memberships) when visiting the members-area endpoint
-		// without a specific membership ID.
-		add_action( 'woocommerce_account_members-area_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
+		// Render unified members area. Hook the actual endpoint slug (which
+		// may differ from 'members-area' based on WCM settings).
+		$endpoint_slug = function_exists( 'wc_memberships_get_members_area_endpoint' )
+			? wc_memberships_get_members_area_endpoint()
+			: 'members-area';
+		add_action( 'woocommerce_account_' . $endpoint_slug . '_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
+		// Also hook the internal key used by this plugin.
+		if ( 'members-area' !== $endpoint_slug ) {
+			add_action( 'woocommerce_account_members-area_endpoint', array( $this, 'maybe_render_unified_view' ), 1 );
+		}
 	}
 
 	/**
@@ -94,6 +98,45 @@ class WCMembershipCompatibility {
 	}
 
 	/**
+	 * Block WooCommerce Memberships from redirecting to a single membership's
+	 * detail view. WCM hooks into template_redirect to auto-redirect users
+	 * who have exactly one membership. We remove that redirect so the unified
+	 * view can render instead.
+	 *
+	 * @since 2.1.0
+	 * @return void
+	 */
+	public function block_membership_redirect() {
+		if ( empty( $this->members_area ) ) {
+			return;
+		}
+
+		// Remove WCM's template_redirect handlers that cause the single-membership redirect.
+		// The method name varies by WCM version.
+		$redirect_methods = array(
+			'redirect_to_members_area',
+			'redirect_to_member_area',
+			'maybe_redirect_to_members_area',
+		);
+
+		global $wp_filter;
+		if ( isset( $wp_filter['template_redirect'] ) ) {
+			foreach ( $wp_filter['template_redirect']->callbacks as $priority => $callbacks ) {
+				foreach ( $callbacks as $key => $callback ) {
+					if ( ! isset( $callback['function'] ) || ! is_array( $callback['function'] ) ) {
+						continue;
+					}
+					$method = $callback['function'][1] ?? '';
+					$object = $callback['function'][0] ?? null;
+					if ( is_object( $object ) && in_array( $method, $redirect_methods, true ) ) {
+						remove_action( 'template_redirect', $callback['function'], $priority );
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Render the unified members area view when visiting /members-area/
 	 * without a specific membership ID.
 	 *
@@ -108,17 +151,8 @@ class WCMembershipCompatibility {
 	 */
 	public function maybe_render_unified_view( $value ) {
 		// Only intercept the top-level members-area (no specific membership selected).
-		// When $value is a membership ID or path like "123/content", WCM handles it.
-		if ( ! empty( $value ) && is_numeric( $value ) ) {
-			return;
-		}
-		// If the value contains a slash, it's a sub-path like "123/content".
-		if ( ! empty( $value ) && false !== strpos( $value, '/' ) ) {
-			return;
-		}
-		// Empty value or non-numeric = top-level listing page.
-		if ( ! empty( $value ) && ! is_numeric( $value ) ) {
-			// Could be a section slug for a specific membership — let WCM handle it.
+		$value = trim( (string) $value );
+		if ( '' !== $value ) {
 			return;
 		}
 
@@ -135,19 +169,72 @@ class WCMembershipCompatibility {
 		// Remove default WCM rendering so we fully control output.
 		$this->remove_default_members_area_output();
 
+		// Build tab sections. Each section is only rendered if it has content.
+		$tabs = array(
+			'memberships' => array(
+				'label'    => __( 'Memberships', 'customize-my-account-page-for-woocommerce' ),
+				'callback' => array( $this, 'render_memberships_overview' ),
+			),
+			'discounts'   => array(
+				'label'    => __( 'Discounts', 'customize-my-account-page-for-woocommerce' ),
+				'callback' => array( $this, 'render_combined_discounts' ),
+			),
+			'content'     => array(
+				'label'    => __( 'Content', 'customize-my-account-page-for-woocommerce' ),
+				'callback' => array( $this, 'render_combined_content' ),
+			),
+			'products'    => array(
+				'label'    => __( 'Products', 'customize-my-account-page-for-woocommerce' ),
+				'callback' => array( $this, 'render_combined_products' ),
+			),
+		);
+
+		$tabs = apply_filters( 'tgwc_membership_unified_tabs', $tabs );
+
 		echo '<div class="tgwc-unified-members-area">';
 
-		// --- Membership overview ---
-		$this->render_memberships_overview( $user_memberships );
+		// --- Tab navigation ---
+		echo '<ul class="tgwc-membership-tabs">';
+		$first = true;
+		foreach ( $tabs as $tab_id => $tab ) {
+			$active = $first ? ' active' : '';
+			echo '<li class="tgwc-membership-tab' . esc_attr( $active ) . '">';
+			echo '<a href="#tgwc-tab-' . esc_attr( $tab_id ) . '" data-tab="' . esc_attr( $tab_id ) . '">' . esc_html( $tab['label'] ) . '</a>';
+			echo '</li>';
+			$first = false;
+		}
+		echo '</ul>';
 
-		// --- Combined Discounts (best discount per product) ---
-		$this->render_combined_discounts( $user_memberships );
+		// --- Tab panels ---
+		$first = true;
+		foreach ( $tabs as $tab_id => $tab ) {
+			$display = $first ? '' : ' style="display:none;"';
+			echo '<div id="tgwc-tab-' . esc_attr( $tab_id ) . '" class="tgwc-membership-tab-panel"' . $display . '>';
+			call_user_func( $tab['callback'], $user_memberships );
+			echo '</div>';
+			$first = false;
+		}
 
-		// --- Combined Content ---
-		$this->render_combined_content( $user_memberships );
-
-		// --- Combined Products ---
-		$this->render_combined_products( $user_memberships );
+		// --- Tab switching JS ---
+		?>
+		<script>
+		(function() {
+			var tabs = document.querySelectorAll('.tgwc-membership-tabs .tgwc-membership-tab a');
+			var panels = document.querySelectorAll('.tgwc-membership-tab-panel');
+			tabs.forEach(function(tab) {
+				tab.addEventListener('click', function(e) {
+					e.preventDefault();
+					var target = this.getAttribute('data-tab');
+					tabs.forEach(function(t) { t.parentElement.classList.remove('active'); });
+					panels.forEach(function(p) { p.style.display = 'none'; });
+					this.parentElement.classList.add('active');
+					var panel = document.getElementById('tgwc-tab-' + target);
+					if (panel) panel.style.display = '';
+				});
+			});
+		})();
+		</script>
+		<?php
 
 		echo '</div>';
 
@@ -260,11 +347,17 @@ class WCMembershipCompatibility {
 				// Normalize to a comparable value.
 				$is_percentage = ( false !== strpos( $type, 'percentage' ) );
 
+				// Determine target type from the rule's content type or discount type.
+				$rule_content_type = method_exists( $rule, 'get_content_type_name' ) ? $rule->get_content_type_name() : '';
+				$is_category = ( false !== strpos( $type, 'category' ) )
+					|| ( false !== strpos( $rule_content_type, 'categor' ) )
+					|| ( method_exists( $rule, 'get_content_type' ) && 'product_cat' === $rule->get_content_type() );
+
 				if ( ! empty( $object_ids ) ) {
 					// Discount applies to specific products/categories.
 					foreach ( $object_ids as $object_id ) {
 						$key = $object_id . '_' . ( $is_percentage ? 'pct' : 'amt' );
-						$target_type = ( false !== strpos( $type, 'category' ) ) ? 'category' : 'product';
+						$target_type = $is_category ? 'category' : 'product';
 
 						if ( ! isset( $discount_rows[ $key ] ) || $amount > $discount_rows[ $key ]['amount'] ) {
 							$discount_rows[ $key ] = array(
@@ -312,8 +405,20 @@ class WCMembershipCompatibility {
 				$term = get_term( $row['object_id'], 'product_cat' );
 				$applies_to = $term && ! is_wp_error( $term ) ? $term->name : sprintf( __( 'Category #%d', 'customize-my-account-page-for-woocommerce' ), $row['object_id'] );
 			} else {
+				// Try loading as a product first, then fall back to post title.
 				$product = wc_get_product( $row['object_id'] );
-				$applies_to = $product ? $product->get_name() : sprintf( __( 'Product #%d', 'customize-my-account-page-for-woocommerce' ), $row['object_id'] );
+				if ( $product ) {
+					$applies_to = $product->get_name();
+				} else {
+					// May be a post/page ID or a category term ID used by the rule.
+					$post = get_post( $row['object_id'] );
+					if ( $post ) {
+						$applies_to = $post->post_title;
+					} else {
+						$term = get_term( $row['object_id'] );
+						$applies_to = ( $term && ! is_wp_error( $term ) ) ? $term->name : sprintf( __( 'Item #%d', 'customize-my-account-page-for-woocommerce' ), $row['object_id'] );
+					}
+				}
 			}
 
 			$discount_display = $row['is_pct']
@@ -580,6 +685,42 @@ class WCMembershipCompatibility {
 			.woocommerce-MyAccount-content .my-membership-tabs li.active a,
 			.woocommerce-MyAccount-content .my-membership-tabs li a:hover {
 				border-bottom-color: currentColor;
+			}
+
+			/* Membership tab navigation */
+			.tgwc-membership-tabs {
+				list-style: none;
+				margin: 0 0 1.5em;
+				padding: 0;
+				display: flex;
+				gap: 0;
+				border-bottom: 2px solid #e5e5e5;
+			}
+
+			.tgwc-membership-tabs li {
+				margin: 0;
+			}
+
+			.tgwc-membership-tabs li a {
+				display: block;
+				padding: 10px 20px;
+				text-decoration: none;
+				color: inherit;
+				opacity: 0.6;
+				border-bottom: 2px solid transparent;
+				margin-bottom: -2px;
+				transition: border-color 0.2s ease, opacity 0.2s ease;
+				font-weight: 500;
+			}
+
+			.tgwc-membership-tabs li a:hover {
+				opacity: 0.85;
+			}
+
+			.tgwc-membership-tabs li.active a {
+				opacity: 1;
+				border-bottom-color: currentColor;
+				font-weight: 600;
 			}
 
 			/* Unified members area sections */
