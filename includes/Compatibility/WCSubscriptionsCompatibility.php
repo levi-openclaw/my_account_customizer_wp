@@ -201,7 +201,7 @@ class WCSubscriptionsCompatibility {
 		$column_label = esc_js( $this->column_label );
 		$plan_map_json = wp_json_encode( $plan_map );
 		?>
-		<script id="tgwc-subscriptions-plan-fallback">
+		<script id="tgwc-subscriptions-plan-fallback-v2.1.7">
 		(function() {
 			var table = document.querySelector('.my_account_subscriptions, .woocommerce-orders-table--subscriptions');
 			if (!table) return;
@@ -257,7 +257,7 @@ class WCSubscriptionsCompatibility {
 			return;
 		}
 		?>
-		<style id="tgwc-subscriptions-compat">
+		<style id="tgwc-subscriptions-compat-v2.1.7">
 			/* Plan column styling */
 			.woocommerce-MyAccount-content .my_account_subscriptions td.subscription-name,
 			.woocommerce-MyAccount-content .my_account_subscriptions th.subscription-name {
