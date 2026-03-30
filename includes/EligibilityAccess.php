@@ -50,7 +50,7 @@ class EligibilityAccess {
 	 */
 	private function __construct() {
 		$this->register_default_rules();
-		add_filter( 'woocommerce_account_menu_items', array( $this, 'filter_menu_items' ), 25 );
+		add_filter( 'tgwc_get_endpoints', array( $this, 'filter_endpoints' ), 20 );
 	}
 
 	/**
@@ -145,17 +145,52 @@ class EligibilityAccess {
 	}
 
 	/**
-	 * Filter menu items based on eligibility.
+	 * Filter the plugin's endpoint tree based on eligibility.
 	 *
-	 * @param array $items Account menu items.
+	 * Hooks into `tgwc_get_endpoints` which provides the full endpoint
+	 * structure including group children. This is what the navigation
+	 * template actually uses to render menu items.
+	 *
+	 * @param array $endpoints The endpoint tree from Settings::get_endpoints().
 	 * @return array
 	 */
-	public function filter_menu_items( $items ) {
+	public function filter_endpoints( $endpoints ) {
 		if ( is_admin() || ! is_user_logged_in() ) {
-			return $items;
+			return $endpoints;
 		}
 
 		$eligibility_settings = $this->get_eligibility_settings();
+		$endpoints_to_hide    = $this->get_ineligible_endpoints( $eligibility_settings );
+
+		if ( empty( $endpoints_to_hide ) ) {
+			return $endpoints;
+		}
+
+		// Remove from top-level endpoints.
+		foreach ( $endpoints_to_hide as $slug ) {
+			unset( $endpoints[ $slug ] );
+		}
+
+		// Remove from group children.
+		foreach ( $endpoints as $key => $endpoint ) {
+			if ( isset( $endpoint['children'] ) ) {
+				foreach ( $endpoints_to_hide as $slug ) {
+					unset( $endpoints[ $key ]['children'][ $slug ] );
+				}
+			}
+		}
+
+		return $endpoints;
+	}
+
+	/**
+	 * Build list of endpoint slugs the current user is not eligible for.
+	 *
+	 * @param array $eligibility_settings Saved toggle states.
+	 * @return array Endpoint slugs to hide.
+	 */
+	private function get_ineligible_endpoints( $eligibility_settings ) {
+		$hide = array();
 
 		foreach ( $this->rules as $rule_key => $rule ) {
 			// Skip if this toggle is not enabled.
@@ -168,17 +203,13 @@ class EligibilityAccess {
 				continue;
 			}
 
-			$endpoint = $rule['endpoint'];
-
-			// If the endpoint is in the menu and the user is NOT eligible, remove it.
-			if ( isset( $items[ $endpoint ] ) && is_callable( $rule['callback'] ) ) {
-				if ( ! call_user_func( $rule['callback'] ) ) {
-					unset( $items[ $endpoint ] );
-				}
+			// If the user is NOT eligible, mark the endpoint for removal.
+			if ( is_callable( $rule['callback'] ) && ! call_user_func( $rule['callback'] ) ) {
+				$hide[] = $rule['endpoint'];
 			}
 		}
 
-		return $items;
+		return $hide;
 	}
 
 	// ------------------------------------------------------------------
