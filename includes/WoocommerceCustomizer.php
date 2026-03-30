@@ -183,6 +183,7 @@ final class WoocommerceCustomizer {
 		$this->ajax         = new Ajax();
 		$this->account_menu = new AccountMenu();
 		new SmartTags();
+		EligibilityAccess::instance();
 
 		// After init action.
 		do_action( 'tgwc_init' );

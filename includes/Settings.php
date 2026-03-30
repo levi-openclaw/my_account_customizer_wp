@@ -247,6 +247,14 @@ class Settings {
 
 		$settings['enable_debug'] = isset( $settings['enable_debug'] ) && tgwc_string_to_bool( $settings['enable_debug'] );
 
+		// Process eligibility toggles — unchecked checkboxes are absent from POST.
+		$eligibility_rules = EligibilityAccess::instance()->get_rules();
+		$eligibility_input = isset( $settings['eligibility'] ) ? $settings['eligibility'] : array();
+		$settings['eligibility'] = array();
+		foreach ( array_keys( $eligibility_rules ) as $rule_key ) {
+			$settings['eligibility'][ $rule_key ] = ! empty( $eligibility_input[ $rule_key ] );
+		}
+
 		$settings = tgwc_parse_args(
 			$settings,
 			array(
@@ -757,6 +765,7 @@ class Settings {
 				'enable_ajax_navigation'        => false,
 				'default_endpoint'              => 'dashboard',
 				'enable_debug'                  => false,
+				'eligibility'                   => array(),
 				'frontend'                      => array(
 					'fontawesome'      => array(
 						'css' => true,
