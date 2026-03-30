@@ -56,6 +56,12 @@ class WCMembershipCompatibility {
 		$this->setup();
 		add_action( 'tgwc_my_account_menu_item', array( $this, 'wc_membership_navigation' ), 1 );
 		add_action( 'wp_head', array( $this, 'output_membership_css' ) );
+
+		// Always show the memberships list table first, even when the user
+		// has only one membership. This prevents the auto-redirect into a
+		// single membership's detail view.
+		add_filter( 'wc_memberships_redirect_single_membership', '__return_false' );
+		add_filter( 'wc_memberships_members_area_my-memberships-section-args', array( $this, 'force_memberships_list' ) );
 	}
 
 	/**
@@ -80,6 +86,23 @@ class WCMembershipCompatibility {
 		} else {
 			$this->members_area = $wc_membership_frontend_instance->get_members_area_instance();
 		}
+	}
+
+	/**
+	 * Ensure the memberships list section is always rendered when visiting the
+	 * members-area endpoint without a specific membership ID.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param array $args Section arguments.
+	 * @return array
+	 */
+	public function force_memberships_list( $args ) {
+		// Ensure pagination shows all memberships.
+		if ( is_array( $args ) && isset( $args['per_page'] ) ) {
+			$args['per_page'] = max( (int) $args['per_page'], 20 );
+		}
+		return $args;
 	}
 
 	/**
