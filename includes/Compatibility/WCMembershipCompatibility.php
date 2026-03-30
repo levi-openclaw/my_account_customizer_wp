@@ -403,8 +403,8 @@ class WCMembershipCompatibility {
 			return;
 		}
 
-		// Step 2: Render as horizontal list items (thumbnail | name | badge + price).
-		echo '<div class="tgwc-discount-list">';
+		// Step 2: Render as horizontal list items with inline styles (theme-proof).
+		echo '<div style="display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:10px !important;">';
 
 		foreach ( $product_discounts as $product_id => $disc ) {
 			$product = wc_get_product( $product_id );
@@ -434,25 +434,40 @@ class WCMembershipCompatibility {
 				$member_price = max( 0, $regular_price - $disc['amount'] );
 			}
 
-			$is_free = ( $disc['is_pct'] && $disc['amount'] >= 100 );
+			$is_free   = ( $disc['is_pct'] && $disc['amount'] >= 100 );
+			$badge_bg  = $is_free ? '#a2964a' : '#171915';
 
-			echo '<div class="tgwc-discount-row" onclick="window.location.href=\'' . esc_url( $permalink ) . '\'" style="cursor:pointer;">';
-			echo '<img class="tgwc-discount-row-img" src="' . esc_url( $thumb_url ) . '" alt="' . esc_attr( $name ) . '" />';
-			echo '<span class="tgwc-discount-row-name">' . esc_html( $name ) . '</span>';
-			echo '<span class="tgwc-discount-row-end">';
-			echo '<span class="tgwc-discount-badge' . ( $is_free ? ' tgwc-discount-badge--free' : '' ) . '">' . esc_html( $badge_text ) . '</span>';
-			echo '<span class="tgwc-discount-row-prices">';
+			// Row
+			echo '<div onclick="window.location.href=\'' . esc_url( $permalink ) . '\'" style="display:flex !important;flex-direction:row !important;align-items:center !important;gap:14px !important;padding:10px 14px !important;border:2px solid rgba(23,25,21,0.1) !important;border-radius:8px !important;background:#fff !important;cursor:pointer !important;box-sizing:border-box !important;transition:border-color .2s,background .2s !important;" onmouseover="this.style.borderColor=\'rgba(162,150,74,0.25)\';this.style.background=\'rgba(162,150,74,0.08)\'" onmouseout="this.style.borderColor=\'rgba(23,25,21,0.1)\';this.style.background=\'#fff\'">';
+
+			// Thumbnail
+			echo '<img src="' . esc_url( $thumb_url ) . '" alt="" style="width:52px !important;height:52px !important;min-width:52px !important;max-width:52px !important;border-radius:6px !important;object-fit:cover !important;display:block !important;flex-shrink:0 !important;margin:0 !important;padding:0 !important;" />';
+
+			// Name
+			echo '<span style="flex:1 1 0% !important;min-width:0 !important;font-family:DM Sans,-apple-system,sans-serif !important;font-size:14px !important;font-weight:500 !important;color:#171915 !important;line-height:1.3 !important;display:block !important;">' . esc_html( $name ) . '</span>';
+
+			// Right side
+			echo '<span style="flex:0 0 auto !important;display:flex !important;flex-direction:column !important;align-items:flex-end !important;gap:2px !important;white-space:nowrap !important;">';
+
+			// Badge
+			echo '<span style="display:inline-block !important;background:' . esc_attr( $badge_bg ) . ' !important;color:#fff !important;padding:2px 10px !important;font-family:DM Sans,-apple-system,sans-serif !important;font-size:10px !important;font-weight:700 !important;text-transform:uppercase !important;letter-spacing:0.06em !important;border-radius:3px !important;line-height:1.6 !important;">' . esc_html( $badge_text ) . '</span>';
+
+			// Prices
+			echo '<span style="display:flex !important;align-items:baseline !important;gap:5px !important;font-family:DM Sans,-apple-system,sans-serif !important;font-size:13px !important;">';
 			if ( $regular_price > 0 ) {
-				echo '<span class="tgwc-price-original"><del>' . wc_price( $regular_price ) . '</del></span>';
+				echo '<span style="color:rgba(23,25,21,0.5) !important;font-weight:400 !important;font-size:12px !important;"><del>' . wc_price( $regular_price ) . '</del></span>';
 			}
-			echo '<span class="tgwc-price-member">' . wc_price( $member_price ) . '</span>';
+			echo '<span style="font-weight:700 !important;color:#171915 !important;">' . wc_price( $member_price ) . '</span>';
 			echo '</span>';
-			echo '<span class="tgwc-discount-row-via">' . esc_html( $disc['plan_name'] ) . '</span>';
-			echo '</span>';
-			echo '</div>';
+
+			// Via
+			echo '<span style="font-family:DM Sans,-apple-system,sans-serif !important;font-size:10px !important;font-weight:500 !important;text-transform:uppercase !important;letter-spacing:0.06em !important;color:rgba(23,25,21,0.5) !important;display:block !important;">' . esc_html( $disc['plan_name'] ) . '</span>';
+
+			echo '</span>'; // end right side
+			echo '</div>'; // end row
 		}
 
-		echo '</div>'; // list
+		echo '</div>'; // end grid
 	}
 
 	/**
@@ -812,122 +827,6 @@ class WCMembershipCompatibility {
 			}
 
 			/* ================================================================
-			   Discount Product List (horizontal rows)
-			   ================================================================ */
-			div.tgwc-discount-list {
-				display: grid !important;
-				grid-template-columns: repeat(2, 1fr) !important;
-				gap: 10px !important;
-			}
-
-			div.tgwc-discount-row {
-				display: flex !important;
-				flex-direction: row !important;
-				align-items: center !important;
-				flex-wrap: nowrap !important;
-				gap: 14px !important;
-				padding: 10px 14px !important;
-				border: 2px solid rgba(23,25,21,0.1) !important;
-				border-radius: 8px !important;
-				background: #fff !important;
-				text-decoration: none !important;
-				color: #171915 !important;
-				transition: border-color 0.2s ease, background 0.2s ease !important;
-				box-sizing: border-box !important;
-			}
-
-			div.tgwc-discount-row:hover {
-				border-color: rgba(162,150,74,0.25) !important;
-				background: rgba(162,150,74,0.08) !important;
-			}
-
-			/* Thumbnail — plain img, no WC classes */
-			img.tgwc-discount-row-img {
-				width: 52px !important;
-				height: 52px !important;
-				min-width: 52px !important;
-				max-width: 52px !important;
-				border-radius: 6px !important;
-				object-fit: cover !important;
-				display: block !important;
-				flex-shrink: 0 !important;
-				margin: 0 !important;
-				padding: 0 !important;
-			}
-
-			/* Product name */
-			span.tgwc-discount-row-name {
-				flex: 1 1 0% !important;
-				min-width: 0 !important;
-				font-family: 'DM Sans', -apple-system, sans-serif !important;
-				font-size: 14px !important;
-				font-weight: 500 !important;
-				color: #171915 !important;
-				line-height: 1.3 !important;
-				display: block !important;
-			}
-
-			/* Right side (badge, price, via) */
-			span.tgwc-discount-row-end {
-				flex: 0 0 auto !important;
-				display: flex !important;
-				flex-direction: column !important;
-				align-items: flex-end !important;
-				gap: 2px !important;
-				white-space: nowrap !important;
-			}
-
-			/* Badge */
-			span.tgwc-discount-badge {
-				display: inline-block !important;
-				background: #171915 !important;
-				color: #fff !important;
-				padding: 2px 10px !important;
-				font-family: 'DM Sans', -apple-system, sans-serif !important;
-				font-size: 10px !important;
-				font-weight: 700 !important;
-				text-transform: uppercase !important;
-				letter-spacing: 0.06em !important;
-				border-radius: 3px !important;
-				line-height: 1.6 !important;
-			}
-
-			span.tgwc-discount-badge--free {
-				background: #a2964a !important;
-			}
-
-			/* Prices */
-			span.tgwc-discount-row-prices {
-				display: flex !important;
-				align-items: baseline !important;
-				gap: 5px !important;
-				font-family: 'DM Sans', -apple-system, sans-serif !important;
-				font-size: 13px !important;
-			}
-
-			.tgwc-discount-row .tgwc-price-original {
-				color: rgba(23,25,21,0.5) !important;
-				font-weight: 400 !important;
-				font-size: 12px !important;
-			}
-
-			.tgwc-discount-row .tgwc-price-member {
-				font-weight: 700 !important;
-				color: #171915 !important;
-			}
-
-			/* Via label */
-			span.tgwc-discount-row-via {
-				font-family: 'DM Sans', -apple-system, sans-serif !important;
-				font-size: 10px !important;
-				font-weight: 500 !important;
-				text-transform: uppercase !important;
-				letter-spacing: 0.06em !important;
-				color: rgba(23,25,21,0.5) !important;
-				display: block !important;
-			}
-
-			/* ================================================================
 			   Responsive
 			   ================================================================ */
 			@media screen and (max-width: 768px) {
@@ -948,26 +847,6 @@ class WCMembershipCompatibility {
 					white-space: nowrap;
 				}
 
-				.tgwc-discount-list {
-					grid-template-columns: 1fr;
-				}
-			}
-
-			@media screen and (max-width: 480px) {
-				.tgwc-discount-row {
-					gap: 10px;
-					padding: 8px 10px;
-				}
-
-				.tgwc-discount-row-thumb {
-					flex: 0 0 40px;
-					width: 40px;
-					height: 40px;
-				}
-
-				.tgwc-discount-row-name {
-					font-size: 13px;
-				}
 			}
 		</style>
 		<?php
