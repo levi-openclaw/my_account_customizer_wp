@@ -271,7 +271,7 @@ class WCMembershipCompatibility {
 
 		// --- Tab switching JS ---
 		?>
-		<script id="tgwc-membership-tabs-v2.1.8">
+		<script id="tgwc-membership-tabs-v2.1.9">
 		(function() {
 			var tabs = document.querySelectorAll('.tgwc-membership-tabs .tgwc-membership-tab a');
 			var panels = document.querySelectorAll('.tgwc-membership-tab-panel');
@@ -454,8 +454,8 @@ class WCMembershipCompatibility {
 
 		// Step 2: Render using proven card pattern — scoped styles + clean HTML.
 		?>
-		<style id="tgwc-discount-cards-v2.1.8">
-			/* tgwc-discount-cards v2.1.8 */
+		<style id="tgwc-discount-cards-v2.1.9">
+			/* tgwc-discount-cards v2.1.9 */
 			.tgwc-dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; align-content: start; }
 			.tgwc-dc { display: flex; align-items: center; gap: 14px; padding: 8px 14px 8px 8px; border: 2px solid rgba(23,25,21,0.1); border-radius: 8px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; box-sizing: border-box; transition: border-color .2s, background .2s; }
 			.tgwc-dc:hover { border-color: rgba(162,150,74,0.25); background: rgba(162,150,74,0.08); }
@@ -464,8 +464,8 @@ class WCMembershipCompatibility {
 			.tgwc-dc-body { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 			.tgwc-dc-name { font-family: 'DM Sans', -apple-system, sans-serif; font-size: 13px; font-weight: 600; color: #171915; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 			.tgwc-dc-end { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
-			.tgwc-dc-badge { display: inline-block; background: #171915; color: #fff; padding: 2px 10px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border-radius: 3px; line-height: 1.6; }
-			.tgwc-dc-badge-free { background: #a2964a; }
+			.tgwc-dc-badge { display: inline-block; background: #A84F0A; color: #fff; padding: 2px 10px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border-radius: 3px; line-height: 1.6; }
+			.tgwc-dc-badge-free { background: #7C9678; }
 			.tgwc-dc-prices { display: flex; align-items: baseline; gap: 5px; font-family: 'DM Sans', sans-serif; font-size: 13px; }
 			.tgwc-dc-prices del { color: rgba(23,25,21,0.4); font-weight: 400; font-size: 12px; }
 			.tgwc-dc-prices strong { font-weight: 700; color: #171915; }
@@ -531,12 +531,12 @@ class WCMembershipCompatibility {
 
 		// AJAX add-to-cart + toast notification.
 		?>
-		<style id="tgwc-cart-toast-v2.1.8">
+		<style id="tgwc-cart-toast-v2.1.9">
 			.tgwc-toast { position: fixed; bottom: 24px; right: 24px; background: #171915; color: #fff; font-family: 'DM Sans', -apple-system, sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 8px; z-index: 99999; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; }
 			.tgwc-toast.tgwc-toast--visible { opacity: 1; transform: translateY(0); }
 			.tgwc-dc-cart[disabled] { opacity: 0.5; pointer-events: none; }
 		</style>
-		<script id="tgwc-ajax-cart-v2.1.8">
+		<script id="tgwc-ajax-cart-v2.1.9">
 		function tgwcAddToCart(btn, productId) {
 			var origText = btn.textContent;
 			btn.disabled = true;
@@ -808,8 +808,8 @@ class WCMembershipCompatibility {
 			return;
 		}
 		?>
-		<style id="tgwc-memberships-compat-v2.1.8">
-			/* tgwc-memberships-compat v2.1.8 */
+		<style id="tgwc-memberships-compat-v2.1.9">
+			/* tgwc-memberships-compat v2.1.9 */
 			/* ================================================================
 			   Gamut Design Tokens
 			   ================================================================ */
